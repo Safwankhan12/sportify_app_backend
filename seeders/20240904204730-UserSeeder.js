@@ -9,6 +9,7 @@ module.exports = {
      firstName: 'Super',
      lastName: "Admin",
      email:"admin@sportify.com",
+     password:"admin@sportify",
      createdAt : new Date(),
      updatedAt : new Date()
    }], {});
