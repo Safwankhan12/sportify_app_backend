@@ -11,6 +11,7 @@ router.post('/login', passport.authenticate("local"),(req,res)=>{
 router.get('/status',(req,res)=>{
     console.log(`Inside /api/auth/status endpoint`)
     console.log(req.user)
+    console.log(req.session)
     return req.user ? res.send(req.user) : res.sendStatus(401)
 })
 module.exports = router
