@@ -6,14 +6,14 @@ const { where } = require('sequelize')
 passport.serializeUser((user, done)=>{
     console.log("inside serialize user")
     console.log(user)
-    done(null, user.email)
+    done(null, user.id)
 })
 
-passport.deserializeUser(async(email, done)=>{
+passport.deserializeUser(async(id, done)=>{
     console.log('inside deserialize user')
-    console.log(`deserializing user with id ${email}`)
+    console.log(`deserializing user with id ${id}`)
     try{
-    const user = await User.findOne({where : {email : email}})
+    const user = await User.findOne({where : {id : id}})
     if (!user)
     {
         throw new Error('User not found')
