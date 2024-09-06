@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const {body, validationResult} = require('express-validator')
+const hashPassword = require('../utils/helpers')
 const {User} = require('../models')
 
 router.post('/adduser',[
@@ -20,11 +21,12 @@ async (req,res)=>{
     {
         return res.status(400).json({errors: errors.array()})
     }
+    const password = hashPassword(req.body.password)
      const NewUser = await User.create({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
-        password: req.body.password
+        password: password
     })
     NewUser.save()
     return res.status(200).json({message: 'User added successfully'})
