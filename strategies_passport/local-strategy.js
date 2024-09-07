@@ -1,8 +1,7 @@
 const passport = require('passport')
 const {Strategy} = require('passport-local')
 const {User} = require('../models')
-const { where } = require('sequelize')
-
+const bcrypt = require('bcrypt')
 passport.serializeUser((user, done)=>{
     console.log("inside serialize user")
     console.log(user)
@@ -34,7 +33,7 @@ module.exports = passport.use(
         {
             throw new Error('User not found')
         }
-        if (user.password !== password)
+        if (!bcrypt.compareSync(password,user.password))
         {
             throw new Error('Invalid credentials')
         }

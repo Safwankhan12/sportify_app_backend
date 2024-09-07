@@ -25,6 +25,12 @@ router.get('/logout', (req,res)=>{
         {
             return res.sendStatus(400)
         }
+        req.session.destroy((err)=>{
+            if (err)
+            {
+                return res.sendStatus(400)
+            }
+        })
         res.sendStatus(200)
     })
 })
