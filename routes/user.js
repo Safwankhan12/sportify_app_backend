@@ -8,7 +8,10 @@ router.post('/adduser',[
     body('firstName').isLength({min:3}).withMessage('First Name should be atleast 3 characters'),
     body('lastName').isLength({min:3}).withMessage('Last Name should be atleast 3 characters'),
     body('email').isEmail().withMessage('Please enter a valid email'),
-    body('password').isLength({min:6}).withMessage('Password should be atleast 6 characters')
+    body('password')
+        .isLength({ min: 8 }).withMessage('Password should be at least 8 characters long')
+        .matches(/\d/).withMessage('Password must contain at least one number')
+        .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage('Password must contain at least one special character'),
 ],
 async (req,res)=>{
     const user = await User.findOne({where : {email : req.body.email}})
@@ -63,5 +66,25 @@ router.delete('/deleteuser/:id', async(req,res)=>{
         truncate: true
     })
     return res.status(200).json({message: 'User deleted successfully'})
+})
+
+
+router.put('/resetpassword/:id', [
+    body('password')
+        .isLength({ min: 8 }).withMessage('Password should be at least 8 characters long')
+        .matches(/\d/).withMessage('Password must contain at least one number')
+        .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage('Password must contain at least one special character'),
+],async(req,res)=>{
+    const userid = req.params.id
+    const user = await User.findOne({where : {id : userid}})
+    if (!user)
+    {
+        return res.status(400).json({error: 'No user found'})
+    }
+    const NewPassword = hashPassword(req.body.password)
+    await user.update({
+        password: NewPassword
+    })
+    return res.status(200).json({message: 'Password updated successfully'})
 })
 module.exports = router
