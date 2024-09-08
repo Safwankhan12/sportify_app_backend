@@ -11,7 +11,7 @@ router.post('/adduser',[
     body('password')
         .isLength({ min: 8 }).withMessage('Password should be at least 8 characters long')
         .matches(/\d/).withMessage('Password must contain at least one number')
-        .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage('Password must contain at least one special character'),
+        .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage('Password must contain at least one special character')
 ],
 async (req,res)=>{
     const user = await User.findOne({where : {email : req.body.email}})
@@ -73,13 +73,18 @@ router.put('/resetpassword/:id', [
     body('password')
         .isLength({ min: 8 }).withMessage('Password should be at least 8 characters long')
         .matches(/\d/).withMessage('Password must contain at least one number')
-        .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage('Password must contain at least one special character'),
+        .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage('Password must contain at least one special character')
 ],async(req,res)=>{
     const userid = req.params.id
     const user = await User.findOne({where : {id : userid}})
     if (!user)
     {
         return res.status(400).json({error: 'No user found'})
+    }
+    const errors = validationResult(req)
+    if (!errors.isEmpty())
+    {
+        return res.status(400).json({errors: errors.array()})
     }
     const NewPassword = hashPassword(req.body.password)
     await user.update({

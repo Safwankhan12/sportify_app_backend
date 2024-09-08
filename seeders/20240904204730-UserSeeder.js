@@ -1,4 +1,5 @@
 'use strict';
+const hashPassword = require('../utils/helpers')
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -9,7 +10,7 @@ module.exports = {
      firstName: 'Super',
      lastName: "Admin",
      email:"admin@sportify.com",
-     password:"admin@sportify",
+     password:hashPassword('admin@sportify'),
      createdAt : new Date(),
      updatedAt : new Date()
    }], {});
