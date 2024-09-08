@@ -1,48 +1,26 @@
-const Db = require('./DatabaseConnection')
-Db()
+const Db = require('./DatabaseConnection');
+Db(); // Initialize your database connection
 const express = require("express");
 const app = express();
-const passport= require('passport')
-const session = require('express-session')
-const MySQLStore = require('express-mysql-session')(session);
-const cors = require('cors')
-require('./strategies_passport/local-strategy')
-const port = 5000;  // changed from 3000 to 5000 because port 3000 will run react app
-const DB_CREDENTIALS = {
-    host : 'localhost',
-    port : '3306',
-    user : 'root',
-    password : '',
-    database : 'sportify_app'
-}
+const port = 5000; // React app will use port 3000
 
-const sessionStore = new MySQLStore(DB_CREDENTIALS) // used fr storing current session
+// Import middlewares
+const sessionMiddleware = require('./middlewares/sessionMiddleware');
+const passportMiddleware = require('./middlewares/passportMiddleware');
+const corsMiddleware = require('./middlewares/corsMiddleware');
+const jsonMiddleware = require('./middlewares/jsonMiddleware');
 
+// Apply middlewares
+app.use(jsonMiddleware);
+app.use(corsMiddleware);
+app.use(sessionMiddleware);
+passportMiddleware(app); // Initialize passport middleware separately
 
-// creating middlewhere to deal with json 
-app.use(express.json());
-app.use(cors())
+// Available routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/user', require('./routes/user'));
 
-// express session middleware to deal with sessions
-app.use(session({
-    key: 'current_session',
-    secret: "safwan_dev",
-    saveUninitialized: false,
-    store : sessionStore,
-    resave: false,
-    cookie:{
-        maxAge : 60000* 60
-    }
-}))
-
- app.use(passport.initialize())
- app.use(passport.session())
-
-
-//available routes
-app.use('/api/auth',require('./routes/auth'))
-app.use('/api/user', require('./routes/user'))
-
+// Start the server
 app.listen(port, () => {
- console.log(`Example app listening on port ${port}`);
+    console.log(`Server running on port ${port}`);
 });
