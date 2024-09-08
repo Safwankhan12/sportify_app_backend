@@ -41,4 +41,14 @@ router.get('/getallusers',async(req,res)=>{
     }
     return res.status(200).json(users)
 })
+
+router.get('/getuser/:id', async(req,res)=>{
+    const userid = req.params.id
+    const user = await User.findOne({where : {id : userid}})
+    if (!user)
+    {
+        return res.status(400).json({error: 'No user found'})
+    }
+    return res.status(200).json(user)
+})
 module.exports = router
