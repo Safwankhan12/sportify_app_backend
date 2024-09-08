@@ -32,4 +32,13 @@ async (req,res)=>{
     return res.status(200).json({message: 'User added successfully'})
 }
 )
+
+router.get('/getallusers',async(req,res)=>{
+    const users = await User.findAll()
+    if (!users)
+    {
+        return res.status(400).json({error: 'No users found'})
+    }
+    return res.status(200).json(users)
+})
 module.exports = router
