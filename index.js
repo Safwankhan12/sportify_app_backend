@@ -19,6 +19,7 @@ passportMiddleware(app); // Initialize passport middleware separately
 // Available routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/user', require('./routes/user'));
+app.use('/api/venues', require('./routes/venue'));
 
 // Start the server
 app.listen(port, () => {
