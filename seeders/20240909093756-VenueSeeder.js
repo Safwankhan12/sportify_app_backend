@@ -1,11 +1,16 @@
 'use strict';
 
+const { UUIDV4 } = require('sequelize');
+
+
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
     
       await queryInterface.bulkInsert('venues', [{
         name: 'Kokan Family Park',
+        uuid : Sequelize.literal('UUID()'),
         latitude : 24.878727680114224,
         longitude : 67.07310669078682,
         address : "Kokan Family Park, 74 Haider Ali Rd, Kokan CHS, Karachi, Karachi City, Sindh",
