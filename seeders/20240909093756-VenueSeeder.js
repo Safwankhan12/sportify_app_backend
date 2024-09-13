@@ -14,15 +14,15 @@ module.exports = {
         latitude : 24.878727680114224,
         longitude : 67.07310669078682,
         address : "Kokan Family Park, 74 Haider Ali Rd, Kokan CHS, Karachi, Karachi City, Sindh",
-        sports : JSON.stringify({
+        sports : {
           'football' : {
             'price' : 500
           },
           'cricket' : {
             'price' :  1000
           }
-        }),
-        availability : JSON.stringify({
+        },
+        availability : {
           'football' : {
             'morning' : '8:00 AM - 10:00 AM',
             'evening' : '4:00 PM - 6:00 PM'
@@ -31,7 +31,7 @@ module.exports = {
             'morning' : '8:00 AM - 10:00 AM',
             'evening' : '4:00 PM - 6:00 PM'
           }
-        }),
+        },
         price : 3000,
         createdAt: new Date(),
         updatedAt: new Date()

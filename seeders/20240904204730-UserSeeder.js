@@ -11,6 +11,7 @@ module.exports = {
      lastName: "Admin",
      email:"admin@sportify.com",
      password:hashPassword('admin@sportify'),
+     role : 'admin',
      createdAt : new Date(),
      updatedAt : new Date()
    }], {});
