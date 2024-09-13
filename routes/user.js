@@ -3,6 +3,7 @@ const router = express.Router()
 const {body, validationResult} = require('express-validator')
 const hashPassword = require('../utils/helpers')
 const {User} = require('../models')
+const isAdmin = require('../middlewares/authenticateAdminMiddleware')
 
 router.post('/adduser',[
     body('firstName').isLength({min:3}).withMessage('First Name should be atleast 3 characters'),
@@ -13,6 +14,7 @@ router.post('/adduser',[
         .matches(/\d/).withMessage('Password must contain at least one number')
         .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage('Password must contain at least one special character')
 ],
+isAdmin,
 async (req,res)=>{
     const user = await User.findOne({where : {email : req.body.email}})
     if (user)
