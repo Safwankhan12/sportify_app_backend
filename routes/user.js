@@ -16,7 +16,7 @@ router.post('/adduser',[
         .matches(/\d/).withMessage('Password must contain at least one number')
         .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage('Password must contain at least one special character')
 ],
-isAdmin,
+
 async (req,res)=>{
     const user = await User.findOne({where : {email : req.body.email}})
     if (user)
