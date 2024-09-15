@@ -4,6 +4,8 @@ const {body, validationResult} = require('express-validator')
 const hashPassword = require('../utils/helpers')
 const {User} = require('../models')
 const isAdmin = require('../middlewares/authenticateAdminMiddleware')
+const { route } = require('./auth')
+const passport = require('passport')
 
 router.post('/adduser',[
     body('firstName').isLength({min:3}).withMessage('First Name should be atleast 3 characters'),
@@ -94,4 +96,14 @@ router.put('/resetpassword/:id', [
     })
     return res.status(200).json({message: 'Password updated successfully'})
 })
+
+// router.get('/profileinfo', passport.authenticate('jwt', { session: false }), (req, res) => {
+//     return res.status(200).send({
+//       success: true,
+//       user: {
+//         id: req.user.id,
+//         email: req.user.email,
+//       },
+//     });
+//   });
 module.exports = router

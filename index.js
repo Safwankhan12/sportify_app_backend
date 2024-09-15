@@ -5,7 +5,6 @@ const app = express();
 const port = 5000; // React app will use port 3000
 
 // Import middlewares
-const sessionMiddleware = require('./middlewares/sessionMiddleware');
 const passportMiddleware = require('./middlewares/passportMiddleware');
 const corsMiddleware = require('./middlewares/corsMiddleware');
 const jsonMiddleware = require('./middlewares/jsonMiddleware');
@@ -13,7 +12,6 @@ const jsonMiddleware = require('./middlewares/jsonMiddleware');
 // Apply middlewares
 app.use(jsonMiddleware);
 app.use(corsMiddleware);
-app.use(sessionMiddleware);
 passportMiddleware(app); // Initialize passport middleware separately
 
 // Available routes

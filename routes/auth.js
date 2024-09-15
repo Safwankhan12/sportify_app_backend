@@ -1,7 +1,10 @@
 const express = require('express')
+require('dotenv').config()
 const router = express.Router()
 const {body, validationResult} = require('express-validator')
 const {User} = require('../models')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 const passport = require('passport')
 const hashPassword = require('../utils/helpers')
 
@@ -38,8 +41,27 @@ async (req,res)=>{
 }
 )
 
-router.post('/login', passport.authenticate("local"),(req,res)=>{
-    res.sendStatus(200)
+router.post('/login', async(req,res)=>{
+    try{
+        const user = await User.findOne({where : {email : req.body.email}})
+        if (!user)
+        {
+            return res.status(404).json({error : 'User not found'})
+        }
+        if (!bcrypt.compareSync(req.body.password,user.password))
+        {
+            return res.status(400).json({error : 'Invalid credentials'})
+        }
+        const payload = {
+            email : user.email,
+            id : user.id
+        }
+        const token = jwt.sign(payload, process.env.JWT_SECRET,{expiresIn: '1h'})
+        return res.status(200).json({success : "Logged in successfully with email " + user.email, token : `Bearer ${token}`})
+    }catch(err)
+    {
+        return res.status(500).json({error : 'Internal server error'})
+    }
 })
 
 router.get('/status',(req,res)=>{
