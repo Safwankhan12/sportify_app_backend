@@ -7,7 +7,7 @@ const isAdmin = require('../middlewares/authenticateAdminMiddleware')
 const { route } = require('./auth')
 const passport = require('passport')
 
-router.post('/adduser',[
+router.post('/adduser',passport.authenticate('jwt', {session:false}),[
     body('firstName').isLength({min:3}).withMessage('First Name should be atleast 3 characters'),
     body('lastName').isLength({min:3}).withMessage('Last Name should be atleast 3 characters'),
     body('email').isEmail().withMessage('Please enter a valid email'),
@@ -16,7 +16,7 @@ router.post('/adduser',[
         .matches(/\d/).withMessage('Password must contain at least one number')
         .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage('Password must contain at least one special character')
 ],
-
+isAdmin,
 async (req,res)=>{
     const user = await User.findOne({where : {email : req.body.email}})
     if (user)
