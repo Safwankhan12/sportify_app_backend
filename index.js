@@ -2,7 +2,7 @@ const Db = require('./DatabaseConnection');
 Db(); // Initialize your database connection
 const express = require("express");
 const app = express();
-const port = 5000; // React app will use port 3000
+const port = 5000; 
 
 // Import middlewares
 const passportMiddleware = require('./middlewares/passportMiddleware');

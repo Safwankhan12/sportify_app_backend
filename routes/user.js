@@ -4,7 +4,6 @@ const {body, validationResult} = require('express-validator')
 const hashPassword = require('../utils/helpers')
 const {User} = require('../models')
 const isAdmin = require('../middlewares/authenticateAdminMiddleware')
-const { route } = require('./auth')
 const passport = require('passport')
 
 router.post('/adduser',passport.authenticate('jwt', {session:false}),[

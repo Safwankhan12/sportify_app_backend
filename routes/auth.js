@@ -5,7 +5,6 @@ const {body, validationResult} = require('express-validator')
 const {User} = require('../models')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const passport = require('passport')
 const hashPassword = require('../utils/helpers')
 
 
@@ -57,7 +56,7 @@ router.post('/login', async(req,res)=>{
             id : user.id
         }
         const token = jwt.sign(payload, process.env.JWT_SECRET,{expiresIn: '1h'})
-        return res.status(200).json({success : "Logged in successfully with email " + user.email, token : `Bearer ${token}`})
+        return res.status(200).json({success : "Logged in successfully with email " + user.email, token : `Bearer ${token}`, role : user.role})
     }catch(err)
     {
         return res.status(500).json({error : 'Internal server error'})
