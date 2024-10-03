@@ -93,8 +93,6 @@ router.get('/logout', (req,res)=>{
 })
 
 router.post('/forgot-password', async(req,res)=>{
-    console.log(process.env.EMAIL)
-    console.log(process.env.PASSWORD)
     try{
         const user = await User.findOne({where : {email : req.body.email}})
         if (!user)
@@ -118,7 +116,7 @@ router.post('/forgot-password', async(req,res)=>{
             }
         })
         const info = transporter.sendMail({
-            to : 'safwankhan525@gmail.com',
+            to : user.email,
             subject : 'Password Reset Code',
             from : 'Team_Spotify',
             html : `Your password reset code is ${resetCode}`
