@@ -1,5 +1,7 @@
-const express = require('express')
 require('dotenv').config()
+const express = require('express')
+const nodemailer = require('nodemailer')
+const crypto = require('crypto')
 const router = express.Router()
 const {body, validationResult} = require('express-validator')
 const {User} = require('../models')
@@ -88,5 +90,48 @@ router.get('/logout', (req,res)=>{
         })
         res.sendStatus(200)
     })
+})
+
+router.post('/forgot-password', async(req,res)=>{
+    try{
+        const user = await User.findOne({where : {email : req.body.email}})
+        if (!user)
+        {
+            return res.status(404).json({error : 'User not found'})
+        }
+        const resetCode = crypto.randomBytes(4).toString('hex')
+        const resetCodeExpiration = Date.now() + 3600000
+        await user.update({
+            resetCode : resetCode,
+            resetCodeExpiration : resetCodeExpiration
+        })
+
+        const transporter = nodemailer.createTransport({
+            service : 'Gmail',
+            auth : {
+                user : process.env.EMAIL,
+                pass : process.env.PASSWORD
+            }
+        })
+
+
+        const mailOptions = {
+            from: 'safwankhan525@gmail.com',
+            to: 'k214840@nu.edu.pk',
+            subject: 'Password Reset Code',
+            text: `Your password reset code is: ${resetCode}`,
+          };
+
+
+          transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+              return res.status(500).send('Error sending email');
+            }
+            res.send('Email sent');
+          });
+    }catch(err)
+    {
+        return res.status(500).json({error : 'Internal server error'})
+    }
 })
 module.exports = router

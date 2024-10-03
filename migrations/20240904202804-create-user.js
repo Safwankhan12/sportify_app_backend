@@ -18,6 +18,12 @@ module.exports = {
       email: {
         type: Sequelize.STRING
       },
+      resetCode : {
+        type : Sequelize.STRING
+      },
+      resetCodeExpiration : {
+        type : Sequelize.DATE
+      },
       role : {
         type : Sequelize.ENUM('admin', 'user'),
         defaultValue : 'user'
