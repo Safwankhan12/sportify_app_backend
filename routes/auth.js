@@ -93,6 +93,8 @@ router.get('/logout', (req,res)=>{
 })
 
 router.post('/forgot-password', async(req,res)=>{
+    console.log(process.env.EMAIL)
+    console.log(process.env.PASSWORD)
     try{
         const user = await User.findOne({where : {email : req.body.email}})
         if (!user)
@@ -111,8 +113,8 @@ router.post('/forgot-password', async(req,res)=>{
             port : 465,
             secure : true,
             auth : {
-                user : 'safwankhan525@gmail.com',
-                pass : 'tuwgmdwxmjybdxsy'
+                user : process.env.EMAIL,
+                pass : process.env.PASSWORD
             }
         })
         const info = transporter.sendMail({
