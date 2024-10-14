@@ -8,6 +8,7 @@ const {User} = require('../models')
 const {Token} = require('../models')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const passport = require('passport')
 const hashPassword = require('../utils/helpers')
 
 
@@ -84,24 +85,17 @@ router.get('/status',(req,res)=>{
     return req.user ? res.send(req.user) : res.sendStatus(401)
 })
 
-router.get('/logout', (req,res)=>{
-    if (!req.user)
+router.post('/logout', passport.authenticate('jwt', {session : false}),async(req,res)=>{
+    try{
+        const token = req.headers.authorization.split(' ')[1]
+
+        await Token.destroy({where : {token : token}})
+
+        return res.status(200).json({message : 'Logged out successfully'})
+    }catch(err)
     {
-        return res.sendStatus(401)
+        return res.status(500).json({error : 'Internal server error'})
     }
-    req.logout((err)=>{
-        if (err)
-        {
-            return res.sendStatus(400)
-        }
-        req.session.destroy((err)=>{
-            if (err)
-            {
-                return res.sendStatus(400)
-            }
-        })
-        res.sendStatus(200)
-    })
 })
 
 router.post('/forgot-password', async(req,res)=>{
