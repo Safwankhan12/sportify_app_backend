@@ -5,6 +5,7 @@ const crypto = require('crypto')
 const router = express.Router()
 const {body, validationResult} = require('express-validator')
 const {User} = require('../models')
+const {Token} = require('../models')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const hashPassword = require('../utils/helpers')
@@ -57,7 +58,18 @@ router.post('/login', async(req,res)=>{
             email : user.email,
             id : user.id
         }
-        const token = jwt.sign(payload, process.env.JWT_SECRET,{expiresIn: '1h'})
+        const token = jwt.sign(payload, process.env.JWT_SECRET,{expiresIn: '20d'})
+        const expirationDate = new Date(Date.now() + 20*24*60*60*1000)
+
+        //await Token.destroy({where : {userId : user.id}})
+
+       const NewToken =  await Token.create({
+            token : token,
+            userId : user.id,
+            expiresAt : expirationDate,
+            deviceInfo : req.headers['user-agent']
+        })
+        NewToken.save()
         return res.status(200).json({success : "Logged in successfully with email " + user.email, token : `Bearer ${token}`, role : user.role})
     }catch(err)
     {
