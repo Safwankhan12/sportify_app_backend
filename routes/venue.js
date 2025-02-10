@@ -6,7 +6,7 @@ const geolib = require("geolib");
 const { route } = require("./auth");
 
 router.post(
-  "/addvenue",
+  "/addnewvenue",
   [
     body("name")
       .isLength({ min: 3 })
@@ -71,7 +71,7 @@ router.get("/getnearbyvenues", async (req, res) => {
             geolib.getDistance(userLocation, {
                 latitude : venue.latitude,
                 longitude : venue.longitude
-            }) <= 1200  // distance is in meters
+            }) <= 1500  // distance is in meters
         )
         return res.status(200).json({ nearbyVenues: nearbyVenues });
       }
@@ -85,7 +85,7 @@ router.get("/getnearbyvenues", async (req, res) => {
   }
 });
 
-router.get('/allvenues', async(req,res)=>{
+router.get('/getallvenues', async(req,res)=>{
     try{
         const allVenues = await Venue.findAll()
         if (!allVenues){
@@ -98,7 +98,7 @@ router.get('/allvenues', async(req,res)=>{
     }
 })
 
-router.get('/:uuid', async(req,res)=>{
+router.get('/getvenue/:uuid', async(req,res)=>{
     const uuid = req.params.uuid
     try{
         const venue = await Venue.findOne({where : {uuid : uuid}})

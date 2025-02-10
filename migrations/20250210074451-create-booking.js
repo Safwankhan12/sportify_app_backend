@@ -23,13 +23,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      contact: {
+      contactNo: {
         type: Sequelize.STRING,
         allowNull: false,
       },
       sportType: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM("Football", "Cricket", "Badminton"),
         allowNull: false,
+        defaultValue : 'Football'
       },
       date: {
         type: Sequelize.DATE,
@@ -40,7 +41,7 @@ module.exports = {
         allowNull: false,
       },
       bookingTime: {
-        type: Sequelize.DATE,
+        type: Sequelize.STRING,
         allowNull: false,
       },
       groundName: {
@@ -50,6 +51,11 @@ module.exports = {
       totalAmount: {
         type: Sequelize.INTEGER,
         allowNull: false,
+      },
+      visibility : {
+        type : Sequelize.ENUM('public','private'),
+        defaultValue : 'public',
+        allowNull : false,
       },
       createdAt: {
         allowNull: false,

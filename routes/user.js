@@ -6,7 +6,7 @@ const {User} = require('../models')
 const isAdmin = require('../middlewares/authenticateAdminMiddleware')
 const passport = require('passport')
 
-router.post('/adduser',passport.authenticate('jwt', {session:false}),[
+router.post('/addnewuser',passport.authenticate('jwt', {session:false}),[
     body('firstName').isLength({min:3}).withMessage('First Name should be atleast 3 characters'),
     body('lastName').isLength({min:3}).withMessage('Last Name should be atleast 3 characters'),
     body('email').isEmail().withMessage('Please enter a valid email'),

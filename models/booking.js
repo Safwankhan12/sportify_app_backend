@@ -46,8 +46,9 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       sportType: {
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM("Football", "Cricket","Badminton"),
         allowNull: false,
+        defaultValue : 'Football'
       },
       date: {
         type: DataTypes.DATE,
@@ -58,7 +59,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       bookingTime: {
-        type: DataTypes.DATE,
+        type: DataTypes.STRING,
         allowNull: false,
       },
       groundName: {
@@ -68,6 +69,11 @@ module.exports = (sequelize, DataTypes) => {
       totalAmount: {
         type: DataTypes.INTEGER,
         allowNull: false,
+      },
+      visibility : {
+        type : DataTypes.ENUM('public','private'),
+        defaultValue : 'public',
+        allowNull : false,
       },
       createdAt: {
         type: DataTypes.DATE,
