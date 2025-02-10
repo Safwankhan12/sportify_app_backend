@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
-const { Booking } = require("../models");
+const { Booking, User } = require("../models");
 const { route } = require("./auth");
 
 router.post('/addnewbooking',[
@@ -15,6 +15,11 @@ router.post('/addnewbooking',[
     body('visibility').isIn(['Public','Private']).withMessage('Visibility should be either Public or Private')
 ], async(req,res)=>{
     try{
+        const user = await User.findOne({where : {email : req.body.userEmail}})
+        if (!user)
+        {
+            return res.status(400).json({error : 'User not found'})
+        }
         const booking = await Booking.findOne({where : {userEmail : req.body.userEmail}})
         if(booking)
         {
