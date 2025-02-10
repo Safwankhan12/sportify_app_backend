@@ -71,7 +71,7 @@ router.get("/getnearbyvenues", async (req, res) => {
             geolib.getDistance(userLocation, {
                 latitude : venue.latitude,
                 longitude : venue.longitude
-            }) <= 1000
+            }) <= 1200  // distance is in meters
         )
         return res.status(200).json({ nearbyVenues: nearbyVenues });
       }

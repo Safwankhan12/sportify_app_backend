@@ -10,13 +10,22 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      User.hasMany(models.Booking,{
+        foreignKey : 'userEmail',
+        sourceKey : 'email',
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE'
+      })
     }
   }
   User.init({
     firstName: DataTypes.STRING,
     lastName: DataTypes.STRING,
-    email: DataTypes.STRING,
+    email: {
+      type : DataTypes.STRING,
+      allowNull : false,
+      unique : true,
+    },
     password: DataTypes.STRING,
     resetCode : DataTypes.STRING,
     resetCodeExpiration : DataTypes.DATE,
