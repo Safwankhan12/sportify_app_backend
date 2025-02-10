@@ -3,6 +3,7 @@ const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const { Venue } = require("../models");
 const geolib = require("geolib");
+const { route } = require("./auth");
 
 router.post(
   "/addvenue",
@@ -70,7 +71,7 @@ router.get("/getnearbyvenues", async (req, res) => {
             geolib.getDistance(userLocation, {
                 latitude : venue.latitude,
                 longitude : venue.longitude
-            }) <= 2000
+            }) <= 1000
         )
         return res.status(200).json({ nearbyVenues: nearbyVenues });
       }
@@ -83,5 +84,35 @@ router.get("/getnearbyvenues", async (req, res) => {
     console.error(err);
   }
 });
+
+router.get('/allvenues', async(req,res)=>{
+    try{
+        const allVenues = await Venue.findAll()
+        if (!allVenues){
+            return res.status(400).json({error : "No venues found"})
+        }
+        return res.status(200).json({allVenues : allVenues})
+    }catch(err)
+    {
+        console.error(err)
+    }
+})
+
+router.get('/:uuid', async(req,res)=>{
+    const uuid = req.params.uuid
+    try{
+        const venue = await Venue.findOne({where : {uuid : uuid}})
+        if (!venue)
+        {
+            return res.status(400).json({error : "Venue not found"})
+        }
+        return res.status(200).json({Venue : venue})
+    }catch(err)
+    {
+        console.error(err)
+    }
+})
+
+
 
 module.exports = router;
