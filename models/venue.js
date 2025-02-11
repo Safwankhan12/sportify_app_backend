@@ -8,7 +8,12 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      Venue.hasMany(models.Booking,{
+        foreignKey : 'venueId',
+        sourceKey : 'uuid',
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE'
+      })
     }
   }
   Venue.init(
@@ -51,6 +56,11 @@ module.exports = (sequelize, DataTypes) => {
       price: {
         type: DataTypes.INTEGER,
         allowNull: true,
+      },
+      status : {
+        type:DataTypes.ENUM('Available', 'Booked'),
+        defaultValue: 'Available',
+        allowNull: true
       },
       createdAt: {
         type: DataTypes.DATE,

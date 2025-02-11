@@ -43,6 +43,11 @@ module.exports = {
         type : Sequelize.INTEGER,
         allowNull : true
       },
+      status : {
+        type : Sequelize.ENUM('Available', 'Booked'),
+        defaultValue : 'Available',
+        allowNull : true
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

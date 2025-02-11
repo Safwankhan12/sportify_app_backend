@@ -14,7 +14,15 @@ module.exports = (sequelize, DataTypes) => {
         onDelete : 'CASCADE',
         onUpdate : 'CASCADE'
       })
+
+      Booking.belongsTo(models.Venue,{
+        foreignKey: 'venueId',
+        targetKey : 'uuid',
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE'
+      })
     }
+
   }
   Booking.init(
     {
@@ -62,9 +70,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      groundName: {
+      venueName: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      venueId : {
+        type:DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+        references:{
+          model: "venues",
+          key : "uuid"
+        }
       },
       totalAmount: {
         type: DataTypes.INTEGER,

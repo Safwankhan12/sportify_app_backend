@@ -44,9 +44,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      groundName: {
+      venueName: {
         type: Sequelize.STRING,
         allowNull: false,
+      },
+      venueId : {
+        type : Sequelize.UUID,
+        defaultValue : Sequelize.UUIDV4,
+        allowNull : false,
       },
       totalAmount: {
         type: Sequelize.INTEGER,
