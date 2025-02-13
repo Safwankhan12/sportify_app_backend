@@ -14,6 +14,13 @@ module.exports = (sequelize, DataTypes) => {
         onDelete : 'CASCADE',
         onUpdate : 'CASCADE'
       })
+
+      Venue.hasMany(models.Game,{
+        foreignKey: 'venueId',
+        sourceKey : 'uuid',
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE'
+      })
     }
   }
   Venue.init(

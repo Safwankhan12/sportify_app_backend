@@ -16,6 +16,13 @@ module.exports = (sequelize, DataTypes) => {
         onDelete : 'CASCADE',
         onUpdate : 'CASCADE'
       })
+
+      User.hasMany(models.Game,{
+        foreignKey : 'userEmail',
+        sourceKey : 'email',
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE'
+      })
     }
   }
   User.init({

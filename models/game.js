@@ -1,32 +1,31 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const {
+  Model
+} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Booking extends Model {
+  class Game extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Booking.belongsTo(models.User,{
+      Game.belongsTo(models.User, {
         foreignKey : 'userEmail',
         targetKey : 'email',
         onDelete : 'CASCADE',
         onUpdate : 'CASCADE'
       })
-
-      Booking.belongsTo(models.Venue,{
+      Game.belongsTo(models.Venue,{
         foreignKey: 'venueId',
         targetKey : 'uuid',
         onDelete : 'CASCADE',
         onUpdate : 'CASCADE'
       })
     }
-
   }
-  Booking.init(
-    {
-      id: {
+  Game.init({
+    id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
@@ -37,46 +36,42 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: true,
       },
-      userEmail: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        references : {
-          model : "users",
-          key : "email"
-        }
-      },
       fullName: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      contactNo: {
+      userEmail: {
         type: DataTypes.STRING,
         allowNull: false,
+        references : {
+          model : 'users',
+          key : 'email'
+        }
       },
-      bookingDate: {
+      venueId: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references : {
+          model : 'venues',
+          key : 'uuid'
+        }
+      },
+      sportType: {
+        type: DataTypes.ENUM("Football", "Cricket", "Badminton"),
+        allowNull: false,
+      },
+      gameDate: {
         type: DataTypes.DATE,
         allowNull: false,
       },
-      bookingTime: {
+      gameTime: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      venueName: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      venueId : {
-        type:DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        allowNull: true,
-        references:{
-          model: "venues",
-          key : "uuid"
-        }
-      },
-      totalAmount: {
-        type: DataTypes.INTEGER,
+      visibility: {
+        type: DataTypes.ENUM("public", "private"),
         allowNull: false,
+        defaultValue: "public",
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -88,13 +83,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: DataTypes.NOW,
       },
-    },
-    {
-      sequelize,
-      modelName: "Booking",
-      tableName: "bookings",
-      timestamps: true,
-    }
-  );
-  return Booking;
+  }, {
+    sequelize,
+    modelName: 'Game',
+    tableName: 'games',
+    timestamps: true,
+  });
+  return Game;
 };
