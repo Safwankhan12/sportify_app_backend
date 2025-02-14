@@ -37,12 +37,12 @@ module.exports = {
       },
       venueName: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       venueId : {
         type : Sequelize.UUID,
         defaultValue : Sequelize.UUIDV4,
-        allowNull : false,
+        allowNull : true,
       },
       totalAmount: {
         type: Sequelize.INTEGER,

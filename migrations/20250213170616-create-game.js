@@ -9,14 +9,41 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      firstName: {
-        type: Sequelize.STRING
+      uuid : {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        allowNull: false,
+        unique: true
       },
-      lastName: {
-        type: Sequelize.STRING
+      fullName : {
+        type: Sequelize.STRING,
+        allowNull: false
       },
-      email: {
-        type: Sequelize.STRING
+      userEmail : {
+        type : Sequelize.STRING,
+        allowNull : false,
+      },
+      venueId : {
+        type : Sequelize.UUID,
+        defaultValue : Sequelize.UUIDV4,
+        allowNull : true
+      },
+      sportType : {
+        type: Sequelize.ENUM("Football", "Cricket", "Badminton"),
+        allowNull: false
+      },
+      gameDate:{
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      gameTime: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      visibility : {
+        type : Sequelize.ENUM("public", "private"),
+        allowNull : false,
+        defaultValue : "public"
       },
       createdAt: {
         allowNull: false,
