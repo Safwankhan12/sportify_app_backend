@@ -15,6 +15,10 @@ module.exports = {
         allowNull: false,
         unique: true
       },
+      gameName : {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
       fullName : {
         type: Sequelize.STRING,
         allowNull: false

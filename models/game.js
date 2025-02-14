@@ -36,6 +36,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: true,
       },
+      gameName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       fullName: {
         type: DataTypes.STRING,
         allowNull: false,

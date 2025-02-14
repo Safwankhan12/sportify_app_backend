@@ -19,6 +19,7 @@ app.use("/api/auth", require("./routes/auth"));
 app.use("/api/user", require("./routes/user"));
 app.use("/api/venue", require("./routes/venue"));
 app.use("/api/booking", require("./routes/booking"));
+app.use('/api/game', require('./routes/game'))
 
 // Start the server
 app.listen(port, () => {
