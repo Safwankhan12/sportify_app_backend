@@ -23,9 +23,48 @@ module.exports = (sequelize, DataTypes) => {
         onDelete : 'CASCADE',
         onUpdate : 'CASCADE'
       })
+      User.hasMany(models.Chat,{
+        foreignKey : 'senderId',
+        sourceKey : 'uuid',
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE'
+      })
+      User.hasMany(models.Chat,{
+        foreignKey : 'receiverId',
+        sourceKey : 'uuid',
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE'
+      })
+
+      User.hasMany(models.Group,{
+        foreignKey : 'createdBy',
+        sourceKey : 'uuid',
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE'
+      })
+
+      User.hasMany(models.GroupMember,{
+        foreignKey : 'userId',
+        sourceKey : 'uuid',
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE'
+      })
+
+      User.hasMany(models.Message,{
+        foreignKey : 'senderId',
+        sourceKey : 'uuid',
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE'
+      })
     }
   }
   User.init({
+    uuid : {
+      type : DataTypes.UUID,
+      defaultValue : DataTypes.UUIDV4,
+      allowNull : false,
+      unique : true
+    },
     firstName: DataTypes.STRING,
     lastName: DataTypes.STRING,
     email: {

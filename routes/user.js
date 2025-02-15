@@ -48,9 +48,9 @@ router.get('/getallusers',async(req,res)=>{
     return res.status(200).json(users)
 })
 
-router.get('/getuser/:id', async(req,res)=>{
-    const userid = req.params.id
-    const user = await User.findOne({where : {id : userid}})
+router.get('/getuser/:uuid', async(req,res)=>{
+    const userid = req.params.uuid
+    const user = await User.findOne({where : {uuid : userid}})
     if (!user)
     {
         return res.status(400).json({error: 'No user found'})
@@ -58,9 +58,9 @@ router.get('/getuser/:id', async(req,res)=>{
     return res.status(200).json(user)
 })
 
-router.delete('/deleteuser/:id', async(req,res)=>{
-    const userid = req.params.id
-    const user = await User.findOne({where : {id : userid}})
+router.delete('/deleteuser/:uuid', async(req,res)=>{
+    const userid = req.params.uuid
+    const user = await User.findOne({where : {uuid : userid}})
     if (!user)
     {
         return res.status(400).json({error: 'No user found'})
@@ -72,14 +72,14 @@ router.delete('/deleteuser/:id', async(req,res)=>{
 })
 
 
-router.put('/resetpassword/:id', [
+router.put('/resetpassword/:uuid', [
     body('password')
         .isLength({ min: 8 }).withMessage('Password should be at least 8 characters long')
         .matches(/\d/).withMessage('Password must contain at least one number')
         .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage('Password must contain at least one special character')
 ],async(req,res)=>{
-    const userid = req.params.id
-    const user = await User.findOne({where : {id : userid}})
+    const userid = req.params.uuid
+    const user = await User.findOne({where : {uuid : userid}})
     if (!user)
     {
         return res.status(400).json({error: 'No user found'})
