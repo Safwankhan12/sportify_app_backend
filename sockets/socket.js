@@ -90,9 +90,9 @@ const setupSocket = (server) => {
 
     // ✅ Remove a Member from Group (Only Host Can Do This)
     socket.on('removeMember', async ({ hostId, groupId, userId }) => {
-      const group = await Group.findByPk(groupId);
+      const group = await Group.findOne({ where: { id: groupId } });
 
-      if (group && group.hostId === hostId) {
+      if (group && group.createdBy === hostId) {
         await GroupMember.destroy({ where: { groupId, userId } });
 
         const userSocketId = onlineUsers.get(userId);
