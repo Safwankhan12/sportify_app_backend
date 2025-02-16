@@ -9,7 +9,11 @@ const {Token} = require('../models')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const passport = require('passport')
+//const twilio = require('twilio')
 const hashPassword = require('../utils/helpers')
+
+// const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN)
+// const TWILIO_PHONE = process.env.TWILIO_PHONE
 
 
 router.post('/signup',[
@@ -42,6 +46,8 @@ async (req,res)=>{
     {
         return res.status(400).json({errors: errors.array()})
     }
+    //const otp = crypto.randomInt(1000,9999)
+    //const opteexpiration = Date.now() + 5 *60 *1000
     const password = hashPassword(req.body.password)
      const NewUser = await User.create({
         firstName: req.body.firstName,
@@ -49,11 +55,44 @@ async (req,res)=>{
         email: req.body.email,
         password: password,
         phoneNo : req.body.phoneNo,
-    })
+        //resetCoded : otp,
+        //resetCodeExpiration : opteexpiration,
+        isPhoneVerified : false
+     })
+    // await client.messages.create({
+    //     body : `Your verification code is ${otp}`,
+    //     to: `+923136361204`,
+    //     from : '+18312760404'
+    // })
     NewUser.save()
-    return res.status(200).json({message: 'User added successfully'})
+    return res.status(200).json({message: 'User added successfully Otp send to number for verification'})
 }
 )
+
+// router.post('/verify-otp',async(req,res)=>{
+//     try{
+//         const {email,otp} = req.body
+//         const user = await User.findOne({where : {email : email}})
+//         if (!user)
+//         {
+//             return res.status(404).json({error : 'User not found'})
+//         }
+//         if (user.resetCode !== otp || user.resetCodeExpiration < Date.now())
+//         {
+//             return res.status(400).json({error : 'Invalid or expired otp'})
+//         }
+
+//         await user.update({
+//             isPhoneVerified : true,
+//             resetCode : null,
+//             resetCodeExpiration : null
+//         })
+//         return res.status(200).json({message : 'Phone verified successfully'})
+//     }catch(err)
+//     {
+//         console.error(err)
+//     }
+// })
 
 router.post('/login', async(req,res)=>{
     try{
@@ -66,6 +105,10 @@ router.post('/login', async(req,res)=>{
         {
             return res.status(400).json({error : 'Invalid credentials'})
         }
+        // if (!user.isPhoneVerified)
+        // {
+        //     return res.status(400).json({error : 'Phone not verified'})
+        // }
         const payload = {
             email : user.email,
             id : user.id

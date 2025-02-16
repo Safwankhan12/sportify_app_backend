@@ -96,6 +96,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     resetCode : DataTypes.STRING,
     resetCodeExpiration : DataTypes.DATE,
+    isPhoneVerified : {
+      type : DataTypes.BOOLEAN,
+      defaultValue : false
+    },
     role : {
       type : DataTypes.ENUM('admin', 'user'),
       defaultValue : 'user'

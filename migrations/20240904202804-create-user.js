@@ -56,6 +56,10 @@ module.exports = {
       resetCodeExpiration : {
         type : Sequelize.DATE
       },
+      isPhoneVerified:{
+        type : Sequelize.BOOLEAN,
+        defaultValue : false
+      },
       role : {
         type : Sequelize.ENUM('admin', 'user'),
         defaultValue : 'user'
