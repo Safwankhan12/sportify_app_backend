@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
-const { Venue } = require("../models");
+const { Venue, User } = require("../models");
 const geolib = require("geolib");
 const { route } = require("./auth");
 
@@ -25,6 +25,7 @@ router.post(
       .isObject()
       .withMessage("Availability should be a object"),
     body("price").isNumeric().withMessage("Price should be a number"),
+    body('ownerId').isUUID().withMessage('owner ID should be a UUID')
   ],
   async (req, res) => {
     const venue = await Venue.findOne({
@@ -35,6 +36,11 @@ router.post(
         name: req.body.name,
       },
     });
+    const venueOwner = await User.findOne({where : {uuid : req.body.ownerId}})
+    if (!venueOwner)
+    {
+      return res.status(400).json({error : "Owner not found"})
+    }
     if (venue) {
       return res.status(400).json({ error: "Venue already exists" });
     }
@@ -50,6 +56,7 @@ router.post(
       sports: req.body.sports,
       availability: req.body.availability,
       price: req.body.price,
+      ownerId: req.body.ownerId
     });
     NewVenue.save();
     return res.status(200).json({ message: "Venue added successfully" });

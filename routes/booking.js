@@ -61,18 +61,50 @@ router.post(
         venueName: req.body.venueName,
         venueId: req.body.venueId,
         totalAmount: req.body.totalAmount,
+        status: "Pending"
       });
-      const updatevenuestatus = await Venue.update(
-        { status: "Booked" },
-        { where: { uuid: req.body.venueId } }
-      );
       NewBooking.save();
-      return res.status(200).json({ message: "Booking added successfully" });
+      return res.status(200).json({ message: "Booking request sent to venue owner for confirmation." });
     } catch (err) {
       console.error(err);
     }
   }
 );
+
+router.put('/confirmbooking/:uuid',async(req,res)=>{
+  try{
+    const {status} = req.body
+    if (status !== "Confirmed" && status !== "Rejected") {
+      return res.status(400).json({ error: "Invalid Status" });
+    }
+    const bookingid = req.params.uuid
+    const booking = await Booking.findOne({where:{uuid:bookingid}})
+    if (!booking)
+    {
+      return res.status(400).json({error:"No booking found"})
+    }
+    const venue = await Venue.findOne({where:{uuid:booking.venueId}})
+    if (!venue)
+    {
+      return res.status(400).json({error:"No Venue found"})
+    }
+    if (status === "Confirmed")
+    {
+      await Booking.update({status:"Confirmed"},{where:{uuid:bookingid}})
+      await Venue.update({status:"Booked"},{where:{uuid:venue.uuid}})
+      return res.status(200).json({message:"Booking confirmed"})
+    }
+    if (status === "Rejected")
+    {
+      await Booking.update({status:"Rejected"},{where:{uuid:bookingid}})
+      await Venue.update({status:"Available"},{where:{uuid:venue.uuid}})
+      return res.status(200).json({message:"Booking rejected"})
+    }
+  }catch(err)
+  {
+    console.error(err);
+  }
+})
 
 router.get("/getallbookings", async (req, res) => {
   try {
