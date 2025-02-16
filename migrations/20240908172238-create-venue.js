@@ -15,6 +15,10 @@ module.exports = {
         allowNull: false,
         unique: true
       },
+      ownerId: {
+        type: Sequelize.UUID,
+        allowNull: false
+      },
       name: {
         type: Sequelize.STRING,
         allowNull : true

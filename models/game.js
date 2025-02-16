@@ -77,6 +77,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: "public",
       },
+      venueName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

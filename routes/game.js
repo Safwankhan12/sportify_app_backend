@@ -23,6 +23,7 @@ router.post(
     body("visibility")
       .isIn(["Public", "Private"])
       .withMessage("Visibility should be either Public or Private"),
+    body('venueName').isLength({min: 3}).withMessage('Venue Name should be at least 3 characters')
   ],
   async (req, res) => {
     try {
@@ -46,7 +47,7 @@ router.post(
         }
         venueId = venue.id; // Assign the found venue's ID
       }
-
+      console.log("bfore existing var")
       const existingGame = await Game.findOne({
         where: {
           userEmail: req.body.userEmail,
@@ -69,6 +70,7 @@ router.post(
         gameTime: req.body.gameTime,
         visibility: req.body.visibility,
         venueId: venueId, // Will be null if venueId is not provided
+        venueName: req.body.venueName
       });
 
       return res

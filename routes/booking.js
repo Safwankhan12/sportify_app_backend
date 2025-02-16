@@ -16,23 +16,16 @@ router.post(
       .withMessage("Contact Number should be atleast 11 digits")
       .matches(/^03[0-9]{2}-?[0-9]{7}$/)
       .withMessage("Contact Number should be of type 03XX-XXXXXXX"),
-    body("sportType")
-      .isIn(["Football", "Cricket", "Badminton"])
-      .withMessage(
-        "Sport Type should be either Football, Cricket or Badminton"
-      ),
     body("bookingDate")
       .isDate()
       .withMessage("Booking Date should be in Date format"),
+    body('bookingTime').isString().withMessage('Booking Time should be a string'),
     body("venueName")
       .isLength({ min: 3 })
       .withMessage("Ground Name should be atleast 3 characters"),
     body("totalAmount")
       .isNumeric()
       .withMessage("Total Amount should be a number"),
-    body("visibility")
-      .isIn(["Public", "Private"])
-      .withMessage("Visibility should be either Public or Private"),
     body("venueId").isUUID().withMessage("Venue ID should be a UUID"),
   ],
   async (req, res) => {
@@ -68,7 +61,6 @@ router.post(
         venueName: req.body.venueName,
         venueId: req.body.venueId,
         totalAmount: req.body.totalAmount,
-        visibility: req.body.visibility,
       });
       const updatevenuestatus = await Venue.update(
         { status: "Booked" },

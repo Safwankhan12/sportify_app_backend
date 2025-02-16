@@ -21,6 +21,12 @@ module.exports = (sequelize, DataTypes) => {
         onDelete : 'CASCADE',
         onUpdate : 'CASCADE'
       })
+      Venue.belongsTo(models.User,{
+        foreignKey : 'ownerId',
+        targetKey : 'uuid',
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE'
+      })
     }
   }
   Venue.init(
@@ -35,6 +41,14 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4, // Automatically generates a UUIDV4
         allowNull: false,
         unique: true,
+      },
+      ownerId : {
+        type: DataTypes.UUID,
+        allowNull: false,
+        references : {
+          model : 'users',
+          key : 'uuid'
+        }
       },
       name: {
         type: DataTypes.STRING,
