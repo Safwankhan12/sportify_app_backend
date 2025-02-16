@@ -22,7 +22,33 @@ module.exports = {
         type: Sequelize.STRING
       },
       email: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull : false,
+        unique : true
+      },
+      password:{
+        type : Sequelize.STRING
+      },
+      phoneNo : {
+        type : Sequelize.STRING,
+        allowNull : false,
+        unique : true
+      },
+      gender : {
+        type : Sequelize.ENUM('male', 'female'),
+        allowNull : true
+      },
+      address : {
+        type : Sequelize.STRING,
+        allowNull : true
+      },
+      bio: {
+        type: Sequelize.STRING,
+        allowNull : true
+      },
+      profilePicture :{
+        type : Sequelize.STRING,
+        allowNull : true
       },
       resetCode : {
         type : Sequelize.STRING
@@ -33,9 +59,6 @@ module.exports = {
       role : {
         type : Sequelize.ENUM('admin', 'user'),
         defaultValue : 'user'
-      },
-      password:{
-        type : Sequelize.STRING
       },
       createdAt: {
         allowNull: false,

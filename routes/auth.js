@@ -19,7 +19,17 @@ router.post('/signup',[
     body('password')
         .isLength({ min: 8 }).withMessage('Password should be at least 8 characters long')
         .matches(/\d/).withMessage('Password must contain at least one number')
-        .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage('Password must contain at least one special character')
+        .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage('Password must contain at least one special character'),
+        body('phoneNo')
+        .matches(/^03\d{9}$/)
+        .withMessage('Phone number should start with 03 and be exactly 11 digits long'),
+    body('confirmPassword').custom((value,{req})=>{
+        if (value !== req.body.password)
+        {
+            throw new Error('Passwords do not match')
+        }
+        return true
+    })
 ],
 async (req,res)=>{
     const user = await User.findOne({where : {email : req.body.email}})
@@ -37,7 +47,8 @@ async (req,res)=>{
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
-        password: password
+        password: password,
+        phoneNo : req.body.phoneNo,
     })
     NewUser.save()
     return res.status(200).json({message: 'User added successfully'})

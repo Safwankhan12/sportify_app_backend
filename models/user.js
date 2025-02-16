@@ -73,6 +73,27 @@ module.exports = (sequelize, DataTypes) => {
       unique : true,
     },
     password: DataTypes.STRING,
+    phoneNo : {
+      type : DataTypes.STRING,
+      allowNull : false,
+      unique : true,
+    },
+    gender : {
+      type : DataTypes.ENUM('male', 'female'),
+      allowNull : true
+    },
+    address : {
+      type : DataTypes.STRING,
+      allowNull : true
+    },
+    bio : {
+      type : DataTypes.STRING,
+      allowNull : true
+    },
+    profilePicture : {
+      type : DataTypes.STRING,
+      allowNull : true
+    },
     resetCode : DataTypes.STRING,
     resetCodeExpiration : DataTypes.DATE,
     role : {
