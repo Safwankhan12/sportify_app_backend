@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const { Booking, User, Venue } = require("../models");
+const {Op} = require('sequelize')
 const { route } = require("./auth");
 
 router.post(
@@ -38,14 +39,21 @@ router.post(
       if (!venue) {
         return res.status(400).json({ error: "Venue not found" });
       }
+      const formattedBookingDate = new Date(req.body.bookingDate).toISOString()
       const booking = await Booking.findOne({
-        where: { userEmail: req.body.userEmail },
-      });
-      if (booking) {
-        return res
-          .status(400)
-          .json({ error: "User already has an existing booking" });
+        where : {
+          venueId : req.body.venueId,
+          bookingDate : formattedBookingDate,
+          bookingTime : req.body.bookingTime
+        }
+      })
+      if (booking && venue.status === "Booked")
+      {
+        return res.status(400).json({error:"Booking already exists for this time and date for this venue"})
       }
+      // if (venue.status === "Booked") {
+      //   return res.status(400).json({ error: "Venue already booked" });
+      // }
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
@@ -97,7 +105,18 @@ router.put('/confirmbooking/:uuid',async(req,res)=>{
     if (status === "Rejected")
     {
       await Booking.update({status:"Rejected"},{where:{uuid:bookingid}})
-      await Venue.update({status:"Available"},{where:{uuid:venue.uuid}})
+
+      // check other bookings for same date time
+      const otherConfirmBookings = await Booking.findOne({where : {
+          venueId: booking.venueId,
+          bookingDate: booking.bookingDate,
+          bookingTime: booking.bookingTime,
+          status: "Confirmed",
+      }})
+
+      if (!otherConfirmBookings) {
+        await Venue.update({status:"Available"},{where:{uuid:venue.uuid}})
+      }
       return res.status(200).json({message:"Booking rejected"})
     }
   }catch(err)
