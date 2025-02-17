@@ -106,6 +106,10 @@ module.exports = (sequelize, DataTypes) => {
       type : DataTypes.BOOLEAN,
       defaultValue : false
     },
+    fcm_token : {
+      type : DataTypes.STRING,
+      allowNull : true
+    },
     role : {
       type : DataTypes.ENUM('admin', 'user'),
       defaultValue : 'user'

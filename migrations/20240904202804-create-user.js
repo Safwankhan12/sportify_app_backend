@@ -60,6 +60,10 @@ module.exports = {
         type : Sequelize.BOOLEAN,
         defaultValue : false
       },
+      fcm_token : {
+        type : Sequelize.STRING,
+        allowNull : true
+      },
       role : {
         type : Sequelize.ENUM('admin', 'user'),
         defaultValue : 'user'
