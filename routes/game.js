@@ -47,11 +47,11 @@ router.post(
         }
         venueId = venue.id; // Assign the found venue's ID
       }
-      console.log("bfore existing var")
+      const formattedGameDate = new Date(req.body.gameDate).toISOString()
       const existingGame = await Game.findOne({
         where: {
           userEmail: req.body.userEmail,
-          gameDate: req.body.gameDate,
+          gameDate: formattedGameDate,
           gameTime: req.body.gameTime,
         },
       });
@@ -107,6 +107,26 @@ router.get("/getgame/:uuid", async (req, res) => {
     console.error(err);
   }
 });
+
+
+router.get('/getusergames/:email',async(req,res)=>{
+  try{
+    const userEmail = req.params.email
+    const user = await User.findOne({where : {email : userEmail}})
+    if(!user)
+    {
+      return res.status(400).json({error : 'User not found'})
+    }
+    const games = await Game.findAll({where : {userEmail : userEmail}})
+    if (!games) {
+      return res.status(400).json({ error: "No games found" });
+    }
+    return res.status(200).json({ Games: games });
+  }catch(err)
+  {
+    console.error(err);
+  }
+})
 
 router.delete("/deletegame/:uuid", async (req, res) => {
   try {

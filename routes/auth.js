@@ -36,8 +36,9 @@ router.post('/signup',[
     })
 ],
 async (req,res)=>{
-    const user = await User.findOne({where : {email : req.body.email}})
-    if (user)
+    const userEmail = await User.findOne({where : {email : req.body.email}})
+    const userPhone = await User.findOne({where : {phoneNo : req.body.phoneNo}})
+    if (userEmail || userPhone)
     {
         return res.status(404).json({error : "User already exists"})
     }

@@ -151,6 +151,26 @@ router.get("/getbooking/:uuid", async (req, res) => {
   }
 });
 
+router.get('/getuserbookings/:email', async(req,res)=>{
+  try{
+    const userEmail = req.params.email
+    const user = await User.findOne({where:{email:userEmail}})
+    if (!user)
+    {
+      return res.status(400).json({error:"User not found"})
+    }
+    const bookings = await Booking.findAll({where:{userEmail:userEmail}})
+    if (!bookings)
+    {
+      return res.status(400).json({error:"No bookings found"})
+    }
+    return res.status(200).json({Bookings:bookings})
+  }catch(err)
+  {
+    console.error(err)
+  }
+})
+
 router.delete("/deletebooking/:uuid", async (req, res) => {
   try {
     const bookingid = req.params.uuid;
