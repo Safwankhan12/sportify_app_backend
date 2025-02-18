@@ -98,9 +98,11 @@ router.post('/verify-game-code', async(req,res)=>{
     if (game.visibility === "private" && game.joinCode !== joinCode) {
       return res.status(400).json({ error: "Invalid Join Code" });
     }
+    return res.status(200).json({ message: "Join Code Verified" });
   }catch(err)
   {
     console.error(err)
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 })
 
@@ -128,6 +130,9 @@ router.post("/joingame", async (req, res) => {
     const existingRequest = await GameRequest.findOne({
       where: { gameId: gameId, userId: userId },
     });
+    // if (existingRequest.status === "approved") {
+    //   return res.status(400).json({ error: "Request already approved" });
+    // }
     if (existingRequest) {
       return res.status(400).json({ error: "Request already exists" });
     }
@@ -153,6 +158,18 @@ router.put("/approverequest/:uuid", async (req, res) => {
       return res.status(400).json({ error: "Request not found" });
     }
     const game = await Game.findOne({ where: { uuid: request.gameId } });
+    if (game.gameStatus === 'closed')
+    {
+      return res.status(400).json({ error: "Game joining is closed" });
+    }
+    if (request.status === "approved") {
+      return res.status(400).json({ error: "Request already approved" });
+    }
+    if (game.joinedPlayers === game.hostTeamSize) {
+      game.gameStatus = "closed";
+      await game.save();
+      return res.status(400).json({ error: "Players are full" });
+    }
     if (request.role === "hostTeam") {
       if (status === "approved") {
         game.joinedPlayers += 1;
@@ -164,10 +181,6 @@ router.put("/approverequest/:uuid", async (req, res) => {
         game.opponentTeamId = request.userId;
         await game.save();
       }
-    }
-    if (game.joinedPlayers === game.hostTeamSize) {
-      game.gameStatus = "closed";
-      await game.save();
     }
     await request.update({ status });
     return res
