@@ -88,16 +88,29 @@ router.post(
   }
 );
 
-router.post("/joingame", async (req, res) => {
-  try {
-    const { gameId, userId, joinCode, role } = req.body;
-
-    const game = await Game.findOne({ where: { uuid: gameId } });
+router.post('/verify-game-code', async(req,res)=>{
+  try{
+    const {joinCode , gameId} = req.body
+    const game = await Game.findOne({where : {uuid : gameId}})
     if (!game) {
       return res.status(400).json({ error: "Game not found" });
     }
     if (game.visibility === "private" && game.joinCode !== joinCode) {
       return res.status(400).json({ error: "Invalid Join Code" });
+    }
+  }catch(err)
+  {
+    console.error(err)
+  }
+})
+
+router.post("/joingame", async (req, res) => {
+  try {
+    const { gameId, userId, role } = req.body;
+
+    const game = await Game.findOne({ where: { uuid: gameId } });
+    if (!game) {
+      return res.status(400).json({ error: "Game not found" });
     }
     if (role === "hostTeam") {
       if (game.gameStatus !== "open") {
@@ -136,10 +149,10 @@ router.put("/approverequest/:uuid", async (req, res) => {
     const { status } = req.body;
     const requestId = req.params.uuid;
     const request = await GameRequest.findOne({ where: { uuid: requestId } });
-    const game = await Game.findOne({ where: { uuid: request.gameId } });
     if (!request) {
       return res.status(400).json({ error: "Request not found" });
     }
+    const game = await Game.findOne({ where: { uuid: request.gameId } });
     if (request.role === "hostTeam") {
       if (status === "approved") {
         game.joinedPlayers += 1;
@@ -151,6 +164,10 @@ router.put("/approverequest/:uuid", async (req, res) => {
         game.opponentTeamId = request.userId;
         await game.save();
       }
+    }
+    if (game.joinedPlayers === game.hostTeamSize) {
+      game.gameStatus = "closed";
+      await game.save();
     }
     await request.update({ status });
     return res
