@@ -53,6 +53,27 @@ module.exports = {
         type : Sequelize.STRING,
         allowNull : false
       },
+      joinCode : {
+        type : Sequelize.STRING,
+        allowNull : true
+      },
+      hostTeamSize:{
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      joinedPlayers : {
+        type : Sequelize.INTEGER,
+        allowNull : true,
+      },
+      opponentTeamId : {
+        type : Sequelize.UUID,
+        allowNull : true
+      },
+      gameStatus : {
+        type : Sequelize.ENUM('open', 'closed', 'opponent_found'),
+        allowNull : false,
+        defaultValue : 'open'
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

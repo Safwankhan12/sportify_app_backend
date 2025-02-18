@@ -22,6 +22,13 @@ module.exports = (sequelize, DataTypes) => {
         onDelete : 'CASCADE',
         onUpdate : 'CASCADE'
       })
+
+      Game.hasMany(models.GameRequest,{
+        foreignKey : 'gameId',
+        sourceKey : 'uuid',
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE'
+      })
     }
   }
   Game.init({
@@ -80,6 +87,27 @@ module.exports = (sequelize, DataTypes) => {
       venueName: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      joinCode : {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      hostTeamSize : {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      joinedPlayers : {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      opponentTeamId : {
+        type : DataTypes.UUID,
+        allowNull : true,
+      },
+      gameStatus : {
+        type: DataTypes.ENUM("open", "closed", "opponent_found"),
+        allowNull: false,
+        defaultValue: "open",
       },
       createdAt: {
         type: DataTypes.DATE,

@@ -62,6 +62,13 @@ module.exports = (sequelize, DataTypes) => {
         onDelete : 'CASCADE',
         onUpdate : 'CASCADE'
       })
+
+      User.hasMany(models.GameRequest,{
+        foreignKey : 'userId',
+        sourceKey : 'uuid',
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE'
+      })
     }
   }
   User.init({
