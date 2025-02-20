@@ -41,7 +41,6 @@ module.exports = {
       },
       venueId : {
         type : Sequelize.UUID,
-        defaultValue : Sequelize.UUIDV4,
         allowNull : true,
       },
       totalAmount: {

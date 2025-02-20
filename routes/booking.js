@@ -67,7 +67,7 @@ router.post(
         bookingDate: req.body.bookingDate,
         bookingTime: req.body.bookingTime,
         venueName: req.body.venueName,
-        venueId: venue.UUID,
+        venueId: venue.uuid,
         totalAmount: req.body.totalAmount,
         status: "Pending"
       });
