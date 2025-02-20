@@ -186,6 +186,26 @@ router.get('/getbookingcount',async(req,res)=>{
   }
 })
 
+router.get('/getbookingbystatus',async(req,res)=>{
+  try{
+    const status = req.query.status
+    if (status !== "Pending" && status !== "Confirmed" && status !== "Rejected")
+    {
+      return res.status(400).json({error:"Invalid Status"})
+    }
+    const bookings = await Booking.findAll({where:{status:status}})
+    if (!bookings)
+    {
+      return res.status(400).json({error:"No bookings found"})
+    }
+    return res.status(200).json({Bookings:bookings})
+  }catch(error)
+  {
+    console.error(error)
+    return res.status(500).json({message:"Internal Server Error"})
+  }
+})
+
 router.delete("/deletebooking/:uuid", async (req, res) => {
   try {
     const bookingid = req.params.uuid;
