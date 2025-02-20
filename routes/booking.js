@@ -170,6 +170,22 @@ router.get('/getuserbookings/:email', async(req,res)=>{
   }
 })
 
+router.get('/getbookingcount',async(req,res)=>{
+  try{
+    const bookingCountTotal = await Booking.count()
+    if (bookingCountTotal === 0)
+    {
+      return res.status(400).json({error:"No bookings found"})
+    }
+    const bookingCountPending = await Booking.count({where:{status:"Pending"}})
+    return res.status(200).json({BookingCountTotal:bookingCountTotal, bookingCountPending:bookingCountPending})
+  }catch(error)
+  {
+    console.error(error)
+    return res.status(500).json({message:"Internal Server Error"})
+  }
+})
+
 router.delete("/deletebooking/:uuid", async (req, res) => {
   try {
     const bookingid = req.params.uuid;
