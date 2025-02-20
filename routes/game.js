@@ -111,6 +111,8 @@ router.post("/joingame", async (req, res) => {
     const { gameId, userId, role } = req.body;
 
     const game = await Game.findOne({ where: { uuid: gameId } });
+    const hostEmail = game.userEmail
+    const host = await User.findOne({ where: { email: hostEmail } });
     if (!game) {
       return res.status(400).json({ error: "Game not found" });
     }
@@ -140,6 +142,7 @@ router.post("/joingame", async (req, res) => {
       gameId: gameId,
       userId: userId,
       role: role,
+      hostId : host.uuid
     });
     return res
       .status(200)
@@ -274,5 +277,26 @@ router.delete("/deletegame/:uuid", async (req, res) => {
     console.error(err);
   }
 });
+
+router.get('/getuserrequests/:uuid' , async(req,res)=>{
+  try{
+    const userId = req.params.uuid
+    const user = await User.findOne({where : {uuid : userId}})
+    if (!user)
+    {
+      return res.status(400).json({error : "User not found"})
+    }
+    const requests = await GameRequest.findAll({where : {hostId : userId}})
+    if (!requests)
+    {
+      return res.status(400).json({error : "No requests found"})
+    }
+    return res.status(200).json({Requests : requests})
+  }catch(error)
+  {
+    console.error(err)
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+})
 
 module.exports = router;

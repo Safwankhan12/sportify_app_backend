@@ -73,7 +73,7 @@ router.post(
         status: "Pending"
       });
       NewBooking.save();
-      return res.status(200).json({ message: "Booking request sent to venue owner for confirmation." });
+      return res.status(200).json({ message: NewBooking});
     } catch (err) {
       console.error(err);
     }

@@ -5,6 +5,7 @@ const hashPassword = require('../utils/helpers')
 const {User} = require('../models')
 const isAdmin = require('../middlewares/authenticateAdminMiddleware')
 const passport = require('passport')
+const { route } = require('./game')
 
 router.post('/addnewuser',passport.authenticate('jwt', {session:false}),[
     body('firstName').isLength({min:3}).withMessage('First Name should be atleast 3 characters'),
@@ -94,6 +95,10 @@ router.put('/resetpassword/:uuid', [
         password: NewPassword
     })
     return res.status(200).json({message: 'Password updated successfully'})
+})
+
+router.post('/editprofile', async(req,res)=>{
+    
 })
 
 // router.get('/profileinfo', passport.authenticate('jwt', { session: false }), (req, res) => {

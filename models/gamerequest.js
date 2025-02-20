@@ -16,6 +16,13 @@ module.exports = (sequelize, DataTypes) => {
         onDelete : 'CASCADE',
         onUpdate : 'CASCADE',
       })
+
+      GameRequest.belongsTo(models.User,{
+        foreignKey : 'hostId',
+        targetKey : 'uuid',
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE',
+      })
       GameRequest.belongsTo(models.Game,{
         foreignKey : 'gameId',
         targetKey : 'uuid',
@@ -45,6 +52,14 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     userId : {
+      type : DataTypes.UUID,
+      allowNull : false,
+      references : {
+        model : 'users',
+        key : 'uuid',
+      }
+    },
+    hostId : {
       type : DataTypes.UUID,
       allowNull : false,
       references : {

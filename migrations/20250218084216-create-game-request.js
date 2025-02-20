@@ -23,6 +23,10 @@ module.exports = {
         type : Sequelize.UUID,
         allowNull : false,
       },
+      hostId : {
+        type : Sequelize.UUID,
+        allowNull : false,
+      },
       role : {
         type  : Sequelize.ENUM('hostTeam', 'opponentTeam'),
         allowNull : false
