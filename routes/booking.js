@@ -28,7 +28,6 @@ router.post(
     body("totalAmount")
       .isNumeric()
       .withMessage("Total Amount should be a number"),
-    body("venueId").isUUID().withMessage("Venue ID should be a UUID"),
   ],
   async (req, res) => {
     try {
@@ -36,14 +35,14 @@ router.post(
       if (!user) {
         return res.status(400).json({ error: "User not found" });
       }
-      const venue = await Venue.findOne({ where: { uuid: req.body.venueId } });
+      const venue = await Venue.findOne({ where: { name: req.body.venueName } });
       if (!venue) {
         return res.status(400).json({ error: "Venue not found" });
       }
       const formattedBookingDate = new Date(req.body.bookingDate).toISOString()
       const booking = await Booking.findOne({
         where : {
-          venueId : req.body.venueId,
+          venueName : req.body.venueName,
           bookingDate : formattedBookingDate,
           bookingTime : req.body.bookingTime
         }
@@ -68,7 +67,7 @@ router.post(
         bookingDate: req.body.bookingDate,
         bookingTime: req.body.bookingTime,
         venueName: req.body.venueName,
-        venueId: req.body.venueId,
+        venueId: venue.UUID,
         totalAmount: req.body.totalAmount,
         status: "Pending"
       });
