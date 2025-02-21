@@ -126,7 +126,7 @@ router.post('/login', async(req,res)=>{
             deviceInfo : req.headers['user-agent']
         })
         NewToken.save()
-        return res.status(200).json({success : "Logged in successfully with email " + user.email, token : `Bearer ${token}`, role : user.role})
+        return res.status(200).json({success : "Logged in successfully with email " + user.email, token : `Bearer ${token}`, user : user})
     }catch(err)
     {
         return res.status(500).json({error : 'Internal server error'})
