@@ -72,7 +72,7 @@ router.post(
         status: "Pending"
       });
       NewBooking.save();
-      return res.status(200).json({ message: NewBooking});
+      return res.status(200).json({ message: NewBooking, userDetails : user});
     } catch (err) {
       console.error(err);
     }
