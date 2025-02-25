@@ -97,10 +97,15 @@ async (req,res)=>{
 
 router.post('/login', async(req,res)=>{
     try{
+        console.log(req.body.isAdminLogin)
         const user = await User.findOne({where : {email : req.body.email}})
         if (!user)
         {
             return res.status(404).json({error : 'User not found'})
+        }
+        if (req.body.isAdminLogin && user.role !== 'admin')
+        {
+            return res.status(400).json({error : "Admin Access Only"})
         }
         if (!bcrypt.compareSync(req.body.password,user.password))
         {
