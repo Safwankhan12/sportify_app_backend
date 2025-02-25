@@ -107,6 +107,10 @@ router.post('/login', async(req,res)=>{
         {
             return res.status(400).json({error : "Admin Access Only"})
         }
+        if (!req.body.isAdminLogin && user.role !== 'user')
+        {
+            return res.status(400).json({error : 'User access only'})
+        }
         if (!bcrypt.compareSync(req.body.password,user.password))
         {
             return res.status(400).json({error : 'Invalid credentials'})
