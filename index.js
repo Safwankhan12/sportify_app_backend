@@ -2,7 +2,7 @@ const Db = require("./DatabaseConnection");
 Db(); // Initialize your database connection
 const express = require("express");
 const http = require('http')
-const setupSocket = require('./sockets/socket')
+const setupSocket = require('./sockets/chatSocket')
 const app = express();
 const server = http.createServer(app)
 
