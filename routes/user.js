@@ -97,8 +97,25 @@ router.put('/resetpassword/:uuid', [
     return res.status(200).json({message: 'Password updated successfully'})
 })
 
-router.post('/editprofile', async(req,res)=>{
-    
+router.put('/editprofile/:uuid', async(req,res)=>{
+    try{
+        const userid = req.params.uuid
+        const user = await User.findOne({where : {uuid : userid}})
+        if (!user)
+        {
+            return res.status(400).json({error: 'No user found'})
+        }
+        await user.update({
+            "gender" : req.body.gender,
+            "bio" : req.body.bio,
+            "address" : req.body.address,
+            "profilePicture" : req.body.profilePicture
+        })
+        return res.status(200).json({message: 'Profile updated successfully'})
+    }catch(err)
+    {
+        console.error(err)
+    }
 })
 
 // router.get('/profileinfo', passport.authenticate('jwt', { session: false }), (req, res) => {

@@ -250,4 +250,23 @@ router.post('/reset-password', [
         return res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+router.post('/verify-profile', async(req,res)=>{
+    try{
+        const user = await User.findOne({where : {uuid : req.body.userId}})
+        if (!user)
+        {
+            return res.status(404).json({error : 'User not found'})
+        }
+        if (!user.bio || !user.profilePicture || !user.address || !user.gender)
+        {
+            return res.status(400).json({error : 'Profile not verified'})
+        }
+        return res.status(200).json({message : 'Profile verified successfully'})
+    }catch(error)
+    {
+        console.error(error)
+        return res.status(500).json({error : 'Internal server error'})
+    }
+})
 module.exports = router
