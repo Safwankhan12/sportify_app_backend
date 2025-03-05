@@ -32,6 +32,7 @@ app.use("/api/user", require("./routes/user"));
 app.use("/api/venue", require("./routes/venue"));
 app.use("/api/booking", require("./routes/booking"));
 app.use('/api/game', require('./routes/game'))
+app.use('/api/chat', require('./routes/chat'))
 
 // Start the server
 server.listen(port, () => {
