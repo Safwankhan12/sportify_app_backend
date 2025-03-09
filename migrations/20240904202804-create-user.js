@@ -50,6 +50,10 @@ module.exports = {
         type : Sequelize.STRING,
         allowNull : true
       },
+      activityPoints : {
+        type : Sequelize.INTEGER,
+        defaultValue : 0
+      },
       resetCode : {
         type : Sequelize.STRING
       },

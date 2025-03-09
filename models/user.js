@@ -107,6 +107,10 @@ module.exports = (sequelize, DataTypes) => {
       type : DataTypes.STRING,
       allowNull : true
     },
+    activityPoints : {
+      type : DataTypes.INTEGER,
+      defaultValue : 0
+    },
     resetCode : DataTypes.STRING,
     resetCodeExpiration : DataTypes.DATE,
     isPhoneVerified : {

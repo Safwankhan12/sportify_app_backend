@@ -97,7 +97,6 @@ async (req,res)=>{
 
 router.post('/login', async(req,res)=>{
     try{
-        console.log(req.body.isAdminLogin)
         const user = await User.findOne({where : {email : req.body.email}})
         if (!user)
         {
@@ -115,6 +114,9 @@ router.post('/login', async(req,res)=>{
         {
             return res.status(400).json({error : 'Invalid credentials'})
         }
+        await user.update({
+            activityPoints : user.activityPoints + 5
+        })
         // if (!user.isPhoneVerified)
         // {
         //     return res.status(400).json({error : 'Phone not verified'})
