@@ -222,6 +222,7 @@ router.put("/approverequest/:uuid", async (req, res) => {
     await request.update({ status });
     return res.status(200).json({
       message: `Request ${status} for role ${request.role} successfully`,
+      userUUID : user.uuid
     });
   } catch (err) {
     console.error(err);
