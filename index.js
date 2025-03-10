@@ -6,6 +6,10 @@ const setupSocket = require('./sockets/chatSocket')
 const app = express();
 const server = http.createServer(app)
 
+//Imporing cron jobs
+const reduceActivityPoints = require('./cron-jobs/reduceActivityPoints')
+reduceActivityPoints()
+
 // initializing socket.io
 setupSocket(server)
 const port = 5000;
