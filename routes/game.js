@@ -96,6 +96,9 @@ router.post(
           html: `Your private game code is ${joinCodeGame}`,
         });
       }
+      await user.update({
+        activityPoints : user.activityPoints + 15
+      })
 
       return res
         .status(200)
@@ -190,15 +193,29 @@ router.put("/approverequest/:uuid", async (req, res) => {
       await game.save();
       return res.status(400).json({ error: "Players are full" });
     }
+    const user = await User.findOne({ where: { uuid: request.userId } });
+    const host = await User.findOne({ where: { uuid: request.hostId } });
     if (request.role === "hostTeam") {
       if (status === "approved") {
         game.joinedPlayers += 1;
+        user.update({
+          activityPoints : user.activityPoints + 10
+        })
+        host.update({
+          activityPoints : host.activityPoints + 5
+        })
         await game.save();
       }
     }
     if (request.role === "opponentTeam") {
       if (status === "approved") {
         game.opponentTeamId = request.userId;
+        user.update({
+          activityPoints : user.activityPoints + 10
+        })
+        host.update({
+          activityPoints : host.activityPoints + 5
+        })
         await game.save();
       }
     }
