@@ -327,4 +327,20 @@ router.get("/getuserrequests/:uuid", async (req, res) => {
   }
 });
 
+router.get('/getgamerequeststatus/:uuid', async(req,res)=>{
+  try{
+    const requestId = req.params.uuid
+    const request = await GameRequest.findOne({where : {uuid : requestId}})
+    if(!request)
+    {
+      return res.status(400).json({error : "Request not found"})
+    }
+    return res.status(200).json({status : request.status, UserUUID : request.userId})
+  }catch(error)
+  {
+    console.error(err);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+})
+
 module.exports = router;
