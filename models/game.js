@@ -29,6 +29,13 @@ module.exports = (sequelize, DataTypes) => {
         onDelete : 'CASCADE',
         onUpdate : 'CASCADE'
       })
+
+      Game.hasOne(models.GameResult,{
+        foreignKey : 'gameId',
+        sourceKey : 'uuid',
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE'
+      })
     }
   }
   Game.init({

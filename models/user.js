@@ -69,6 +69,20 @@ module.exports = (sequelize, DataTypes) => {
         onDelete : 'CASCADE',
         onUpdate : 'CASCADE'
       })
+
+      User.hasMany(models.UserBadge,{
+        foreignKey : 'userId',
+        sourceKey : 'uuid',
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE'
+      })
+
+      User.hasMany(models.GameResult,{
+        foreignKey : 'userId',
+        sourceKey : 'uuid',
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE'
+      })
     }
   }
   User.init({
@@ -108,6 +122,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull : true
     },
     activityPoints : {
+      type : DataTypes.INTEGER,
+      defaultValue : 0
+    },
+    loginCount : {
       type : DataTypes.INTEGER,
       defaultValue : 0
     },

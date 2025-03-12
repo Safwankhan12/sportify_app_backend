@@ -54,6 +54,10 @@ module.exports = {
         type : Sequelize.INTEGER,
         defaultValue : 0
       },
+      loginCount : {
+        type : Sequelize.INTEGER,
+        defaultValue : 0
+      },
       resetCode : {
         type : Sequelize.STRING
       },
