@@ -5,6 +5,7 @@ const { body, validationResult } = require("express-validator");
 const { Booking, User, Venue, Game, GameRequest } = require("../models");
 const PrivateGameCode = require("../utils/PrivateCode");
 const nodemailer = require("nodemailer");
+const checkAndAwardBadges = require('../utils/BadgeService')
 router.post(
   "/addnewgame",
   [
@@ -99,6 +100,8 @@ router.post(
       await user.update({
         activityPoints : user.activityPoints + 15
       })
+
+      await checkAndAwardBadges(user.uuid)
 
       return res
         .status(200)
@@ -205,6 +208,7 @@ router.put("/approverequest/:uuid", async (req, res) => {
           activityPoints : host.activityPoints + 5
         })
         await game.save();
+        await checkAndAwardBadges(user.uuid)
       }
     }
     if (request.role === "opponentTeam") {
@@ -217,6 +221,7 @@ router.put("/approverequest/:uuid", async (req, res) => {
           activityPoints : host.activityPoints + 5
         })
         await game.save();
+        checkAndAwardBadges(user.uuid)
       }
     }
     await request.update({ status });

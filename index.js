@@ -37,6 +37,7 @@ app.use("/api/venue", require("./routes/venue"));
 app.use("/api/booking", require("./routes/booking"));
 app.use('/api/game', require('./routes/game'))
 app.use('/api/chat', require('./routes/chat'))
+app.use('/api/badge', require('./routes/badge'))
 
 // Start the server
 server.listen(port, () => {
