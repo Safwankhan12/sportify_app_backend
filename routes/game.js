@@ -133,8 +133,16 @@ router.post("/verify-game-code", async (req, res) => {
 router.post("/joingame", async (req, res) => {
   try {
     const { gameId, userId, role } = req.body;
-
+    const user = await User.findOne({ where: { uuid: userId } });
+    if (!user)
+    {
+      return res.status(400).json({ error: "User not found" });
+    }
     const game = await Game.findOne({ where: { uuid: gameId } });
+    if (!game)
+    {
+      return res.status(400).json({ error: "Game not found" });
+    }
     const hostEmail = game.userEmail;
     const host = await User.findOne({ where: { email: hostEmail } });
     if (!game) {
