@@ -8,7 +8,9 @@ const server = http.createServer(app)
 
 //Imporing cron jobs
 const reduceActivityPoints = require('./cron-jobs/reduceActivityPoints')
+const checkBadgeEligibility = require('./cron-jobs/checkBadgeEligibility')
 reduceActivityPoints()
+checkBadgeEligibility()
 
 // initializing socket.io
 setupSocket(server)
