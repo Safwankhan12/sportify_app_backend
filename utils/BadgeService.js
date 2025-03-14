@@ -1,5 +1,6 @@
 const { where } = require("sequelize");
 const { User, Badge, UserBadge, Game, GameRequest, GameResult } = require("../models");
+const sendBadgeNotification = require('../NotificationService/BadgeNotificationService')
 
 const BADGE_REQUIREMENTS = {
   beginner: { loginCount: 3 },
@@ -36,6 +37,7 @@ const checkAndAwardBadges = async (userId) => {
         console.log(
           `Badge ${badge.name} awarded to user ${user.firstName} with email ${user.email}`
         );
+        await sendBadgeNotification(user.uuid, badge.name)
       }
     }
     return true;
