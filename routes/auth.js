@@ -12,6 +12,7 @@ const passport = require("passport");
 //const twilio = require('twilio')
 const hashPassword = require("../utils/helpers");
 const checkAndAwardBadges = require("../utils/BadgeService");
+const sendPasswordNotification = require('../NotificationService/ForgotPasswordNotificationService')
 
 // const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN)
 // const TWILIO_PHONE = process.env.TWILIO_PHONE
@@ -199,21 +200,8 @@ router.post("/forgot-password", async (req, res) => {
       resetCodeExpiration: resetCodeExpiration,
     });
 
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      auth: {
-        user: process.env.EMAIL,
-        pass: process.env.PASSWORD,
-      },
-    });
-    const info = transporter.sendMail({
-      to: user.email,
-      subject: "Password Reset Code",
-      from: "Team_Spotify",
-      html: `Your password reset code is ${resetCode}`,
-    });
+    
+    await sendPasswordNotification(user.email, resetCode)
     return res.status(200).json({ message: "Reset code sent successfully" });
   } catch (err) {
     console.error("Error:", err);
