@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
-const { Booking, User, Venue, Game, GameRequest } = require("../models");
+const { Booking, User, Venue, Game, GameRequest, GameResult } = require("../models");
 const PrivateGameCode = require("../utils/PrivateCode");
 const nodemailer = require("nodemailer");
 const checkAndAwardBadges = require('../utils/BadgeService')
@@ -60,10 +60,10 @@ router.post(
           gameTime: req.body.gameTime,
         },
       });
-      if (existingGame) {
+      if (existingGame && existingGame.gameProgress === 'in_progress') {
         return res
           .status(400)
-          .json({ message: "User already has an existing game" });
+          .json({ message: "User already has an existing game in progress" });
       }
       const joinCodeGame = PrivateGameCode();
       const newGame = await Game.create({
@@ -352,6 +352,51 @@ router.get('/getgamerequeststatus/:uuid', async(req,res)=>{
   }catch(error)
   {
     console.error(err);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+})
+
+router.post('/recordgameresult', async(req,res)=>{
+  try{
+    const {gameId, userId, score, result} = req.body
+    const user = await User.findOne({where : {uuid : userId}})
+    if(!user)
+    {
+      return res.status(400).json({error : "User not found"})
+    }
+    const game = await Game.findOne({where : {uuid : gameId}})
+    if(!game)
+    {
+      return res.status(400).json({error : "Game not found"})
+    }
+    const currentDate = new Date()
+    const gameDateTime = new Date(`${game.gameDate}T${game.gameTime}`)
+    const bufferTime = 2 * 60 * 60 * 1000
+    const gameEndTime = new Date(gameDateTime.getTime() + bufferTime);
+    if (currentDate < gameEndTime)
+    {
+      return res.status(400).json({error: "Game is still in progress or hasn't started yet. Results can only be recorded after the game has finished."})
+    }
+    const existingResult = await GameResult.findOne({where : {gameId : gameId, userId : userId}})
+    if(existingResult)
+    {
+      return res.status(400).json({error : "Result already recorded"})
+    }
+    const gameResult = await GameResult.create({
+      gameId : gameId,
+      userId : userId,
+      score : score,
+      result : result
+    })
+    await user.update({
+      activityPoints : user.activityPoints + 5
+    })
+
+    await checkAndAwardBadges(user.uuid)
+    return res.status(200).json({message : "Game result recorded successfully", gameResult : gameResult})
+  }catch(error)
+  {
+    console.error('Error in recording game result',error)
     return res.status(500).json({ message: "Internal Server Error" });
   }
 })

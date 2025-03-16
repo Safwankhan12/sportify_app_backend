@@ -74,6 +74,11 @@ module.exports = {
         allowNull : false,
         defaultValue : 'open'
       },
+      gameProgress : {
+        type : Sequelize.ENUM('in_progress', 'completed'),
+        allowNull : false,
+        defaultValue : 'in_progress'
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
