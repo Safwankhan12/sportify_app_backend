@@ -229,7 +229,7 @@ router.put("/approverequest/:uuid", async (req, res) => {
           activityPoints : host.activityPoints + 5
         })
         await game.save();
-        checkAndAwardBadges(user.uuid)
+        await checkAndAwardBadges(user.uuid)
       }
     }
     await request.update({ status });
@@ -358,47 +358,134 @@ router.get('/getgamerequeststatus/:uuid', async(req,res)=>{
 
 router.post('/recordgameresult', async(req,res)=>{
   try{
-    const {gameId, userId, score, result} = req.body
-    const user = await User.findOne({where : {uuid : userId}})
-    if(!user)
-    {
-      return res.status(400).json({error : "User not found"})
+    const {gameId, userId, score, result} = req.body;
+    
+    // Find user and game
+    const user = await User.findOne({where : {uuid : userId}});
+    if(!user) {
+      return res.status(400).json({error : "User not found"});
     }
-    const game = await Game.findOne({where : {uuid : gameId}})
-    if(!game)
-    {
-      return res.status(400).json({error : "Game not found"})
+    
+    const game = await Game.findOne({where : {uuid : gameId}});
+    if(!game) {
+      return res.status(400).json({error : "Game not found"});
     }
-    const currentDate = new Date()
-    const gameDateTime = new Date(`${game.gameDate}T${game.gameTime}`)
-    const bufferTime = 2 * 60 * 60 * 1000
-    const gameEndTime = new Date(gameDateTime.getTime() + bufferTime);
-    if (currentDate < gameEndTime)
-    {
-      return res.status(400).json({error: "Game is still in progress or hasn't started yet. Results can only be recorded after the game has finished."})
+    
+    // Parse the game time range (e.g., "2:15pm-3:15pm", "3:45pm-1:10am")
+    const timeRange = game.gameTime.split('-');
+    if (timeRange.length !== 2) {
+      return res.status(400).json({error: "Invalid game time format"});
     }
-    const existingResult = await GameResult.findOne({where : {gameId : gameId, userId : userId}})
-    if(existingResult)
-    {
-      return res.status(400).json({error : "Result already recorded"})
+    
+    // Function to convert time string (like "2:15am", "3:45pm") to minutes since midnight
+    const parseTimeToMinutes = (timeStr) => {
+      // Clean up the time string and make lowercase for easier parsing
+      const cleanTimeStr = timeStr.trim().toLowerCase();
+      
+      // Determine if it's AM or PM
+      const isPM = cleanTimeStr.includes('pm');
+      const isAM = cleanTimeStr.includes('am');
+      
+      if (!isPM && !isAM) {
+        return null; // Cannot determine AM/PM
+      }
+      
+      // Remove the am/pm part
+      const timeWithoutAMPM = cleanTimeStr.replace(/am|pm/g, '').trim();
+      
+      // Check if there are minutes
+      const hasMinutes = timeWithoutAMPM.includes(':');
+      
+      let hours, minutes;
+      
+      if (hasMinutes) {
+        // Parse time with minutes (e.g., "2:15")
+        const timeParts = timeWithoutAMPM.split(':');
+        hours = parseInt(timeParts[0]);
+        minutes = parseInt(timeParts[1]);
+      } else {
+        // Parse time without minutes (e.g., "2")
+        hours = parseInt(timeWithoutAMPM);
+        minutes = 0;
+      }
+      
+      // Convert to 24-hour format
+      if (isPM && hours < 12) hours += 12;
+      if (isAM && hours === 12) hours = 0;
+      
+      // Return total minutes since midnight
+      return hours * 60 + minutes;
+    };
+    
+    const startMinutes = parseTimeToMinutes(timeRange[0]);
+    const endMinutes = parseTimeToMinutes(timeRange[1]);
+    
+    if (startMinutes === null || endMinutes === null) {
+      return res.status(400).json({error: "Could not parse game time"});
     }
+    
+    // Create the game date object
+    const gameDate = new Date(game.gameDate);
+    
+    // Create the game end time
+    const gameEndTime = new Date(gameDate);
+    const endHours = Math.floor(endMinutes / 60);
+    const endMinutesRemainder = endMinutes % 60;
+    
+    gameEndTime.setHours(endHours, endMinutesRemainder, 0, 0);
+    
+    // If end time is earlier than start time, it means the game ends the next day
+    if (endMinutes < startMinutes) {
+      gameEndTime.setDate(gameEndTime.getDate() + 1);
+    }
+    
+    // Current date and time
+    const currentDate = new Date();
+    
+    // Check if the game has finished
+    if (currentDate < gameEndTime) {
+      return res.status(400).json({
+        error: "Game is still in progress or hasn't started yet. Results can only be recorded after the game has finished."
+      });
+    }
+    
+    // Check if result already exists
+    const existingResult = await GameResult.findOne({
+      where: {
+        gameId: gameId,
+        userId: userId
+      }
+    });
+    
+    if (existingResult) {
+      return res.status(400).json({error: "Result already recorded for this user and game"});
+    }
+    
+    // Create new game result
     const gameResult = await GameResult.create({
-      gameId : gameId,
-      userId : userId,
-      score : score,
-      result : result
-    })
+      gameId,
+      userId,
+      score,
+      result
+    });
+    
+    // Update user activity points
     await user.update({
-      activityPoints : user.activityPoints + 5
-    })
-
-    await checkAndAwardBadges(user.uuid)
-    return res.status(200).json({message : "Game result recorded successfully", gameResult : gameResult})
-  }catch(error)
-  {
-    console.error('Error in recording game result',error)
+      activityPoints: user.activityPoints + 5
+    });
+    
+    // Check for badges
+    await checkAndAwardBadges(user.uuid);
+    
+    return res.status(200).json({
+      message: "Game result recorded successfully",
+      gameResult: gameResult
+    });
+    
+  } catch(error) {
+    console.error('Error in recording game result', error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
-})
+});
 
 module.exports = router;
