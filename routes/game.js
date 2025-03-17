@@ -6,6 +6,7 @@ const { Booking, User, Venue, Game, GameRequest, GameResult } = require("../mode
 const PrivateGameCode = require("../utils/PrivateCode");
 const nodemailer = require("nodemailer");
 const checkAndAwardBadges = require('../utils/BadgeService')
+const PrivateCodeNotification = require('../NotificationService/PrivateCodeNotificationService')
 router.post(
   "/addnewgame",
   [
@@ -80,22 +81,7 @@ router.post(
         hostTeamSize: req.body.hostTeamSize,
       });
       if (req.body.visibility === "private") {
-        const transporter = nodemailer.createTransport({
-          host: "smtp.gmail.com",
-          port: 465,
-          secure: true,
-          auth: {
-            user: process.env.EMAIL,
-            pass: process.env.PASSWORD,
-          },
-        });
-
-        const info = transporter.sendMail({
-          to: user.email,
-          subject: "Private Game Code",
-          from: "Team_Spotify",
-          html: `Your private game code is ${joinCodeGame}`,
-        });
+        await PrivateCodeNotification(user.email, joinCodeGame)
       }
       await user.update({
         activityPoints : user.activityPoints + 15
