@@ -476,7 +476,9 @@ router.post('/recordgameresult', async(req,res)=>{
     
     // Check for badges
     await checkAndAwardBadges(user.uuid);
-    
+    await game.update({
+      gameProgress : 'completed'
+    })
     return res.status(200).json({
       message: "Game result recorded successfully",
       gameResult: gameResult
