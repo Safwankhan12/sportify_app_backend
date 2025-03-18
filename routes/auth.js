@@ -125,6 +125,7 @@ router.post("/login", async (req, res) => {
     if (!bcrypt.compareSync(req.body.password, user.password)) {
       return res.status(400).json({ error: "Invalid credentials" });
     }
+    await Token.destroy({where : {userId : user.id}})
     await user.update({
       activityPoints: user.activityPoints + 5,
       loginCount: user.loginCount + 1,
@@ -142,7 +143,7 @@ router.post("/login", async (req, res) => {
     });
     const expirationDate = new Date(Date.now() + 20 * 24 * 60 * 60 * 1000);
 
-    //await Token.destroy({where : {userId : user.id}})
+    
 
     const NewToken = await Token.create({
       token: token,
