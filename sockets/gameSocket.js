@@ -50,7 +50,7 @@ const setupGameSocket = (io) => {
     });
   });
 
-  return io;
+  return gameNamespace;
 };
 
 module.exports = setupGameSocket;

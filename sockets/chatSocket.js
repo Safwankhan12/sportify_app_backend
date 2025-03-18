@@ -144,7 +144,7 @@ const setupSocket = (io) => {
     });
   });
 
-  return io;
+  return chatNamespace;
 };
 
 module.exports = setupSocket;
