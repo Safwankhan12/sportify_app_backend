@@ -167,6 +167,7 @@ router.post("/joingame", async (req, res) => {
       .json({ message: "Request sent successfully", request: request });
   } catch (err) {
     console.error(err);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
@@ -195,10 +196,10 @@ router.put("/approverequest/:uuid", async (req, res) => {
     if (request.role === "hostTeam") {
       if (status === "approved") {
         game.joinedPlayers += 1;
-        user.update({
+        await user.update({
           activityPoints : user.activityPoints + 10
         })
-        host.update({
+        await host.update({
           activityPoints : host.activityPoints + 5
         })
         await game.save();
@@ -208,10 +209,10 @@ router.put("/approverequest/:uuid", async (req, res) => {
     if (request.role === "opponentTeam") {
       if (status === "approved") {
         game.opponentTeamId = request.userId;
-        user.update({
+        await user.update({
           activityPoints : user.activityPoints + 10
         })
-        host.update({
+        await host.update({
           activityPoints : host.activityPoints + 5
         })
         await game.save();
@@ -225,6 +226,7 @@ router.put("/approverequest/:uuid", async (req, res) => {
     });
   } catch (err) {
     console.error(err);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
