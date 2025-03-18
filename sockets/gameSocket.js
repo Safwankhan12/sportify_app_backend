@@ -1,16 +1,11 @@
-const { Server } = require('socket.io');
 const { Game, GameRequest, User } = require('../models');
 
 let onlineUsers = new Map();
 
-const setupGameSocket = (server) => {
-  const io = new Server(server, {
-    cors: {
-      origin: '*',
-    },
-  });
+const setupGameSocket = (io) => {
+  const gameNamespace = io.of('/game');
 
-  io.on('connection', (socket) => {
+  gameNamespace.on('connection', (socket) => {
     console.log('New user connected to game socket:', socket.id);
 
     // Save online users
@@ -26,7 +21,7 @@ const setupGameSocket = (server) => {
       const hostSocketId = onlineUsers.get(host.uuid);
 
       if (hostSocketId) {
-        io.to(hostSocketId).emit('userJoinedGame', { gameId, userId });
+        gameNamespace.to(hostSocketId).emit('userJoinedGame', { gameId, userId });
       }
     });
 
@@ -36,7 +31,7 @@ const setupGameSocket = (server) => {
       const userSocketId = onlineUsers.get(request.userId);
 
       if (userSocketId) {
-        io.to(userSocketId).emit('requestStatusUpdate', { requestId, status });
+        gameNamespace.to(userSocketId).emit('requestStatusUpdate', { requestId, status });
       }
     });
 

@@ -1,17 +1,12 @@
-const { Server } = require('socket.io');
 const { Message, Chat, Group, GroupMember } = require('../models');
 
 let onlineUsers = new Map();
 
-const setupSocket = (server) => {
-  const io = new Server(server, {
-    cors: {
-      origin: '*',
-    },
-  });
+const setupSocket = (io) => {
+  const chatNamespace = io.of('/chat');
 
-  io.on('connection', (socket) => {
-    console.log('New user connected:', socket.id);
+  chatNamespace.on('connection', (socket) => {
+    console.log('New user connected to chat socket:', socket.id);
 
     // ✅ Save online users
     socket.on('join', ({userId}) => {
@@ -45,7 +40,7 @@ const setupSocket = (server) => {
 
       const receiverSocketId = onlineUsers.get(receiverId);
       if (receiverSocketId) {
-        io.to(receiverSocketId).emit('receiveMessage', newMessage);
+        chatNamespace.to(receiverSocketId).emit('receiveMessage', newMessage);
       }
 
       // Notify sender
@@ -72,7 +67,7 @@ const setupSocket = (server) => {
 
         const userSocketId = onlineUsers.get(userId);
         if (userSocketId) {
-          io.to(userSocketId).emit('addedToGroup', { groupId });
+          chatNamespace.to(userSocketId).emit('addedToGroup', { groupId });
         }
 
         // Notify all group members
@@ -80,7 +75,7 @@ const setupSocket = (server) => {
         groupMembers.forEach(member => {
           const memberSocketId = onlineUsers.get(member.userId);
           if (memberSocketId) {
-            io.to(memberSocketId).emit('groupUpdate', { message: `User ${userId} was added to the group.` });
+            chatNamespace.to(memberSocketId).emit('groupUpdate', { message: `User ${userId} was added to the group.` });
           }
         });
       } else {
@@ -97,7 +92,7 @@ const setupSocket = (server) => {
 
         const userSocketId = onlineUsers.get(userId);
         if (userSocketId) {
-          io.to(userSocketId).emit('removedFromGroup', { groupId });
+          chatNamespace.to(userSocketId).emit('removedFromGroup', { groupId });
         }
 
         // Notify all group members
@@ -105,7 +100,7 @@ const setupSocket = (server) => {
         groupMembers.forEach(member => {
           const memberSocketId = onlineUsers.get(member.userId);
           if (memberSocketId) {
-            io.to(memberSocketId).emit('groupUpdate', { message: `User ${userId} was removed from the group.` });
+            chatNamespace.to(memberSocketId).emit('groupUpdate', { message: `User ${userId} was removed from the group.` });
           }
         });
       } else {
@@ -129,7 +124,7 @@ const setupSocket = (server) => {
       groupMembers.forEach((member) => {
         const receiverSocketId = onlineUsers.get(member.userId);
         if (receiverSocketId && member.userId !== senderId) {
-          io.to(receiverSocketId).emit('receiveMessage', newMessage);
+          chatNamespace.to(receiverSocketId).emit('receiveMessage', newMessage);
         }
       });
     });

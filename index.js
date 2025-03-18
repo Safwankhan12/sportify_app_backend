@@ -1,10 +1,13 @@
 const Db = require("./DatabaseConnection");
 Db(); // Initialize your database connection
 const express = require("express");
+const { Server } = require('socket.io');
 const http = require('http')
 const setupSocket = require('./sockets/chatSocket')
+const setupGameSocket = require('./sockets/gameSocket')
 const app = express();
 const server = http.createServer(app)
+const io = new Server(server, { cors: { origin: "*" } });
 
 //Imporing cron jobs
 const reduceActivityPoints = require('./cron-jobs/reduceActivityPoints')
@@ -13,7 +16,8 @@ reduceActivityPoints()
 checkBadgeEligibility()
 
 // initializing socket.io
-setupSocket(server)
+setupSocket(io)
+setupGameSocket(io)
 const port = 5000;
 
 
