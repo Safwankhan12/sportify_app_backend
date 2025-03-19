@@ -59,10 +59,12 @@ router.get("/getallusers", async (req, res) => {
 
 router.get("/getuser/:uuid", async (req, res) => {
   const userid = req.params.uuid;
-  const user = await User.findOne({ where: { uuid: userid } });
+  let user = await User.findOne({ where: { uuid: userid } });
   if (!user) {
     return res.status(400).json({ error: "No user found" });
   }
+  const userbio = await UserBio.findOne({ where: { userId: user.uuid } });
+  user = { ...user.dataValues, userbio };
   return res.status(200).json(user);
 });
 
