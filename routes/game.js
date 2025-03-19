@@ -164,7 +164,7 @@ router.post("/joingame", async (req, res) => {
     });
     return res
       .status(200)
-      .json({ message: "Request sent successfully", request: request });
+      .json({ message: "Request sent successfully", request: request, UserName : user.firstName });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Internal Server Error" });
