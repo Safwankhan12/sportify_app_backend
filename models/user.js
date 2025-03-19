@@ -90,6 +90,12 @@ module.exports = (sequelize, DataTypes) => {
         onDelete : 'CASCADE',
         onUpdate : 'CASCADE'
       })
+      User.hasOne(models.UserBio,{
+        foreignKey : 'userId',
+        sourceKey : 'uuid',
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE'
+      })
     }
   }
   User.init({
@@ -117,10 +123,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull : true
     },
     address : {
-      type : DataTypes.STRING,
-      allowNull : true
-    },
-    bio : {
       type : DataTypes.STRING,
       allowNull : true
     },

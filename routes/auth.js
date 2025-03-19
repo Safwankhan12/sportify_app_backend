@@ -4,7 +4,7 @@ const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
-const { User } = require("../models");
+const { User, UserBio } = require("../models");
 const { Token } = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -281,7 +281,12 @@ router.post("/verify-profile", async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    if (!user.bio || !user.profilePicture || !user.address || !user.gender) {
+    const userbio = await UserBio.findOne({ where: { userId: user.uuid } });
+    if (!userbio)
+    {
+      return res.status(400).json({error : 'Bio not found'})
+    }
+    if (!userbio.description || !userbio.skillLevel || !userbio.experience || !user.profilePicture || !user.address || !user.gender) {
       return res.status(400).json({ error: "Profile not verified" });
     }
     return res.status(200).json({ message: "Profile verified successfully" });

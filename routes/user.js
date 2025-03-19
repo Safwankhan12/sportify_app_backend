@@ -3,7 +3,7 @@ const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const hashPassword = require("../utils/helpers");
 const GetActiveLevel = require("../utils/GetActiveLevel");
-const { User } = require("../models");
+const { User, UserBio } = require("../models");
 const isAdmin = require("../middlewares/authenticateAdminMiddleware");
 const passport = require("passport");
 const { route } = require("./game");
@@ -116,7 +116,6 @@ router.put("/editprofile/:uuid", async (req, res) => {
     }
     await user.update({
       gender: req.body.gender,
-      bio: req.body.bio,
       address: req.body.address,
       profilePicture: req.body.profilePicture,
     });
@@ -125,6 +124,39 @@ router.put("/editprofile/:uuid", async (req, res) => {
     console.error(err);
   }
 });
+
+router.put('/edituserbio/:uuid', async(req,res)=>{
+  try{
+    const userid = req.params.uuid
+    const user = await User.findOne({where: {uuid: userid}})
+    if (!user) {
+      return res.status(400).json({ error: "No user found" });
+    }
+    const userbio = await UserBio.findOne({where: {userId: user.uuid}})
+    if (!userbio)
+    {
+      await UserBio.create({
+        userId : user.uuid,
+        description : req.body.description,
+        skillLevel: req.body.skillLevel,
+        experience: req.body.experience,
+      })
+      return res.status(200).json({message: "User Bio created successfully"})
+    }
+    else{
+      await userbio.update({
+        description : req.body.description,
+        skillLevel: req.body.skillLevel,
+        experience: req.body.experience,
+      })
+      return res.status(200).json({message: "User Bio updated successfully"})
+    }
+  }catch(error)
+  {
+    console.error(error)
+    return res.status(500).json({error: "Internal Server Error"})
+  }
+})
 
 router.get("/get-active-level/:uuid", async (req, res) => {
   try {
