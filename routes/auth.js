@@ -152,6 +152,7 @@ router.post("/login", async (req, res) => {
       deviceInfo: req.headers["user-agent"],
     });
     NewToken.save();
+    const userbio = await UserBio.findOne({ where: { userId: user.uuid } });
     await checkAndAwardBadges(user.uuid);
     return res
       .status(200)
@@ -159,6 +160,7 @@ router.post("/login", async (req, res) => {
         success: "Logged in successfully with email " + user.email,
         token: `Bearer ${token}`,
         user: user,
+        userbio: userbio,
       });
   } catch (err) {
     return res.status(500).json({ error: "Internal server error" });
