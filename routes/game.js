@@ -321,6 +321,7 @@ router.get("/getuserrequests/:uuid", async (req, res) => {
       where: { hostId: userId } ,
       include : [{
         model : User,
+        as : 'Requester',
         attributes : ['firstName', 'lastName']
       }]
     });

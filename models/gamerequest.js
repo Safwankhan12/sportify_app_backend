@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       GameRequest.belongsTo(models.User,{
         foreignKey : 'userId',
+        as : 'Requester',
         targetKey : 'uuid',
         onDelete : 'CASCADE',
         onUpdate : 'CASCADE',
