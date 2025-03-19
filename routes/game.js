@@ -317,13 +317,19 @@ router.get("/getuserrequests/:uuid", async (req, res) => {
     if (!user) {
       return res.status(400).json({ error: "User not found" });
     }
-    const requests = await GameRequest.findAll({ where: { hostId: userId } });
+    const requests = await GameRequest.findAll({ 
+      where: { hostId: userId } ,
+      include : [{
+        model : User,
+        attributes : ['firstName', 'lastName']
+      }]
+    });
     if (!requests) {
       return res.status(400).json({ error: "No requests found" });
     }
     return res.status(200).json({ Requests: requests });
   } catch (error) {
-    console.error(err);
+    console.error(error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
@@ -339,7 +345,7 @@ router.get('/getgamerequeststatus/:uuid', async(req,res)=>{
     return res.status(200).json({status : request.status, UserUUID : request.userId})
   }catch(error)
   {
-    console.error(err);
+    console.error(error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 })
