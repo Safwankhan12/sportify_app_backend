@@ -5,6 +5,7 @@ const { body, validationResult } = require("express-validator");
 const { Booking, User, Venue } = require("../models");
 const { Op } = require("sequelize");
 const { route } = require("./auth");
+const sendBookingConfirmNotification = require('../NotificationService/BookingConfirmNotificationService')
 
 // First, we need to modify the addnewbooking route to check for overlapping times
 // This function checks if two time ranges overlap
@@ -213,6 +214,7 @@ router.put('/confirmbooking/:uuid', async(req, res) => {
       
       await Booking.update({ status: "Confirmed" }, { where: { uuid: bookingid } });
       await Venue.update({ status: "Booked" }, { where: { uuid: venue.uuid } });
+      await sendBookingConfirmNotification(booking.userEmail, booking.bookingDate, booking.bookingTime, booking.venueName);
       return res.status(200).json({ message: "Booking confirmed" });
     }
     
