@@ -67,11 +67,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       sports: {
-        type: DataTypes.JSON, // JSON to store array of strings or objects
+        type: DataTypes.STRING,
         allowNull: true,
       },
       availability: {
-        type: DataTypes.JSON, // JSON for complex structure (array of objects)
+        type: DataTypes.STRING, // JSON for complex structure (array of objects)
         allowNull: true,
       },
       price: {

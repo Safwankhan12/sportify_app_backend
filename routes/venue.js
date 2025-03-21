@@ -20,10 +20,10 @@ router.post(
     body("address")
       .isLength({ min: 3 })
       .withMessage("Address should be atleast 3 characters"),
-    body("sports").isObject().withMessage("Sports should be a object"),
+    body("sports").isString().withMessage("Sports should be a string"),
     body("availability")
-      .isObject()
-      .withMessage("Availability should be a object"),
+      .isString()
+      .withMessage("Availability should be a string"),  
     body("price").isNumeric().withMessage("Price should be a number"),
     body('ownerId').isUUID().withMessage('owner ID should be a UUID')
   ],

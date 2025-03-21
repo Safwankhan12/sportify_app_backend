@@ -36,11 +36,11 @@ module.exports = {
         allowNull : true
       },
       sports:{
-        type : Sequelize.JSON,
+        type : Sequelize.STRING,
         allowNull : true
       },
       availability : {
-        type : Sequelize.JSON,
+        type : Sequelize.STRING,
         allowNull : true
       },
       price : {
