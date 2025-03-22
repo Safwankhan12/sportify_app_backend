@@ -12,6 +12,7 @@ const io = new Server(server, { cors: { origin: "*" } });
 //Imporing cron jobs
 const reduceActivityPoints = require('./cron-jobs/reduceActivityPoints')
 const checkBadgeEligibility = require('./cron-jobs/checkBadgeEligibility')
+require('./cron-jobs/updateLeaderboard')
 reduceActivityPoints()
 checkBadgeEligibility()
 

@@ -7,6 +7,7 @@ const { User, UserBio } = require("../models");
 const isAdmin = require("../middlewares/authenticateAdminMiddleware");
 const passport = require("passport");
 const { route } = require("./game");
+const {getLeaderboardCache} = require('../cron-jobs/updateLeaderboard')
 
 router.post(
   "/addnewuser",
@@ -174,6 +175,32 @@ router.get("/get-active-level/:uuid", async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+router.get('/leaderboard', async(req,res)=>{
+  try{
+    return res.status(200).json(getLeaderboardCache())
+  }catch(error)
+  {
+    console.error('Error fetching leaderboard', error)
+    return res.status(500).json({error: "Internal Server Error"})
+  }
+})
+
+router.get('/leaderboard/:uuid/rank', async(req,res)=>{
+  try{
+    const userid = req.params.uuid
+    const rankQuery = await User.findAll({
+      attributes: ['uuid', 'activityPoints', 'firstName', 'lastName'],
+      order: [['activityPoints', 'DESC']]
+    })
+    const rank = rankQuery.findIndex(user => user.uuid === userid) + 1
+    return res.status(200).json({rank})
+  }catch(error)
+  {
+    console.error('Error fetching users leaderboard rank', error)
+    return res.status(500).json({error: "Internal Server Error"})
+  }
+})
 
 // router.get('/profileinfo', passport.authenticate('jwt', { session: false }), (req, res) => {
 //     return res.status(200).send({
