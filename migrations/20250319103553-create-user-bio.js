@@ -28,7 +28,7 @@ module.exports = {
         allowNull: true
       },
       experience: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: true
       },
       createdAt: {
