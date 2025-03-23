@@ -270,7 +270,11 @@ router.get("/getgame/:uuid", async (req, res) => {
     if (!game) {
       return res.status(400).json({ error: "Game not found" });
     }
-    return res.status(200).json({ Game: game });
+    const gameHost = await User.findOne({ where: { email: game.userEmail } });
+    if (!gameHost) {
+      return res.status(400).json({ error: "Game Host not found" });
+    }
+    return res.status(200).json({ Game: game, Host : gameHost });
   } catch (err) {
     console.error(err);
   }
