@@ -69,6 +69,10 @@ module.exports = {
         type : Sequelize.UUID,
         allowNull : true
       },
+      opponentDifficulty : {
+        type : Sequelize.ENUM('Beginner', 'Average', 'Strong', 'Pro'),
+        allowNull : true
+      },
       gameStatus : {
         type : Sequelize.ENUM('open', 'closed', 'opponent_found'),
         allowNull : false,
