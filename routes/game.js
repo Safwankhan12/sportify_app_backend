@@ -490,4 +490,36 @@ router.post('/recordgameresult', async(req,res)=>{
   }
 });
 
+router.get('/getgameplayers/:uuid', async(req,res)=>{
+  try{
+    const gameid = req.params.uuid
+    const game = await Game.findOne({where : {uuid : gameid}});
+    if(!game)
+    {
+      return res.status(400).json({error : "Game not found"});
+    }
+    const joinedPlayersData = await GameRequest.findAll({
+      where : {gameId : gameid, status:'approved', role:'hostTeam'},
+      include : [{
+        model : User,
+        as : 'Requester',
+        attributes : ['firstName', 'lastName', 'email', 'uuid', 'phoneNo']
+      }]
+    });
+    const opponentTeamData = await GameRequest.findOne({
+      where : {gameId : gameid, role : 'opponentTeam', status : 'approved'},
+      include : [{
+        model : User,
+        as : 'Requester',
+        attributes : ['firstName', 'lastName', 'email', 'uuid', 'phoneNo']
+      }]
+    });
+    return res.status(200).json({joinedPlayersData, opponentTeamData});
+  }catch(error)
+  {
+    console.error('Error fetching game players', error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+})
+
 module.exports = router;
