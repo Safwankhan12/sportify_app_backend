@@ -115,6 +115,14 @@ module.exports = (sequelize, DataTypes) => {
         type : DataTypes.ENUM('Beginner', 'Average', 'Strong', 'Pro'),
         allowNull : true,
       },
+      isOpponent : {
+        type : DataTypes.BOOLEAN,
+        allowNull : true,
+      },
+      isTeamPlayer : {
+        type : DataTypes.BOOLEAN,
+        allowNull : true,
+      },
       gameStatus : {
         type: DataTypes.ENUM("open", "closed", "opponent_found"),
         allowNull: false,

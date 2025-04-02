@@ -73,6 +73,14 @@ module.exports = {
         type : Sequelize.ENUM('Beginner', 'Average', 'Strong', 'Pro'),
         allowNull : true
       },
+      isOpponent : {
+        type : Sequelize.BOOLEAN,
+        allowNull : true,
+      },
+      isTeamPlayer : {
+        type : Sequelize.BOOLEAN,
+        allowNull : true,
+      },
       gameStatus : {
         type : Sequelize.ENUM('open', 'closed', 'opponent_found'),
         allowNull : false,

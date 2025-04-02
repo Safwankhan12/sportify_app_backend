@@ -80,6 +80,8 @@ router.post(
         joinCode: req.body.visibility === "private" ? joinCodeGame : null,
         hostTeamSize: req.body.hostTeamSize,
         opponentDifficulty: req.body.opponentDifficulty ? req.body.opponentDifficulty : null,
+        isOpponent : req.body.isOpponent,
+        isTeamPlayer : req.body.isTeamPlayer
       });
       if (req.body.visibility === "private") {
         await PrivateCodeNotification(user.email, joinCodeGame)
