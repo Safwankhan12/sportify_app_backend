@@ -282,15 +282,49 @@ router.get("/getuserbookings/:email", async (req, res) => {
   }
 });
 
-router.get("/getbookingcount", async (req, res) => {
+router.get('/getadminbookings/:email', async(req,res)=>{
+  try{
+    const adminemail = req.params.email
+    const admin = await User.findOne({where:{email:adminemail}})
+    if(!admin)
+    {
+      return res.status(400).json({error:"Admin not found"})
+    }
+    const venue = await Venue.findOne({where:{ownerId:admin.uuid}})
+    if(!venue)
+    {
+      return res.status(400).json({error:"No venue found associated with this admin"})
+    }
+    const bookings = await Booking.findAll({where:{venueId:venue.uuid}})
+    if(!bookings)
+    {
+      return res.status(400).json({error:"No bookings found"})
+    }
+    return res.status(200).json({ Bookings: bookings });
+  }catch(error)
+  {
+    console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+})
+
+router.get("/getbookingcount/:email", async (req, res) => {
   try {
-    const bookingCountTotal = await Booking.count();
-    if (bookingCountTotal === 0) {
+    const adminemail = req.params.email;
+    const admin = await User.findOne({ where: { email: adminemail } });
+    if (!admin) {
+      return res.status(400).json({ error: "Admin not found" });
+    }
+    const venue = await Venue.findOne({ where: { ownerId: admin.uuid } });
+    if (!venue) {
+      return res.status(400).json({ error: "No venue found associated with this admin" });
+    }
+    const bookingsTotal = await Booking.findAll({where: { venueId: venue.uuid }});
+    if (bookingsTotal.length === 0) {
       return res.status(400).json({ error: "No bookings found" });
     }
-    const bookingCountPending = await Booking.count({
-      where: { status: "Pending" },
-    });
+    const bookingCountTotal = bookingsTotal.length
+    const bookingCountPending = bookingsTotal.filter(booking => booking.status === "Pending").length;
     return res.status(200).json({
       BookingCountTotal: bookingCountTotal,
       bookingCountPending: bookingCountPending,
@@ -301,7 +335,7 @@ router.get("/getbookingcount", async (req, res) => {
   }
 });
 
-router.get("/getbookingbystatus", async (req, res) => {
+router.get("/getbookingbystatus/:email", async (req, res) => {
   try {
     const status = req.query.status;
     if (
@@ -311,7 +345,16 @@ router.get("/getbookingbystatus", async (req, res) => {
     ) {
       return res.status(400).json({ error: "Invalid Status" });
     }
-    const bookings = await Booking.findAll({ where: { status: status } });
+    const adminemail = req.params.email;
+    const admin = await User.findOne({ where: { email: adminemail } });
+    if (!admin) {
+      return res.status(400).json({ error: "Admin not found" });
+    }
+    const venue = await Venue.findOne({ where: { ownerId: admin.uuid } });
+    if (!venue) {
+      return res.status(400).json({ error: "No venue found associated with this admin" });
+    }
+    const bookings = await Booking.findAll({ where: { status: status, venueId : venue.uuid } });
     if (!bookings) {
       return res.status(400).json({ error: "No bookings found" });
     }
