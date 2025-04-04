@@ -7,6 +7,7 @@ const PrivateGameCode = require("../utils/PrivateCode");
 const nodemailer = require("nodemailer");
 const checkAndAwardBadges = require('../utils/BadgeService')
 const PrivateCodeNotification = require('../NotificationService/PrivateCodeNotificationService')
+const { Op } = require("sequelize");
 router.post(
   "/addnewgame",
   [
@@ -520,6 +521,126 @@ router.get('/getgameplayers/:uuid', async(req,res)=>{
   }catch(error)
   {
     console.error('Error fetching game players', error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+})
+
+
+router.get('/search',async(req,res)=>{
+  try{
+    const {
+      gameName,
+      sportType,
+      visibility,
+      venueName,
+      startDate,
+      endDate,
+      userEmail,
+      gameStatus,
+      joinedPlayers,
+      hostTeamSize,
+      opponentDifficulty,
+      isOpponent,
+      isTeamPlayer,
+      limit,
+      offset
+    } = req.query
+    const whereClause = {}
+    if (gameName) {
+      whereClause.gameName = { [Op.like]: `%${gameName}%` };
+    }
+    if (sportType) {
+      whereClause.sportType = sportType;
+    }
+    if (visibility) {
+      whereClause.visibility = visibility;
+    }
+    if (venueName) {
+      whereClause.venueName = { [Op.like]: `%${venueName}%` };
+    }
+    if (startDate && endDate) {
+      whereClause.gameDate = {
+        [Op.between]: [new Date(startDate), new Date(endDate)]
+      };
+    } else if (startDate) {
+      whereClause.gameDate = { [Op.gte]: new Date(startDate) };
+    } else if (endDate) {
+      whereClause.gameDate = { [Op.lte]: new Date(endDate) };
+    }
+    if (userEmail) {
+      whereClause.userEmail = userEmail;
+    }
+    if (gameStatus) {
+      whereClause.gameStatus = gameStatus;
+    }
+
+    if (joinedPlayers) {
+      whereClause.joinedPlayers = parseInt(joinedPlayers);
+    }
+
+    if (hostTeamSize) {
+      whereClause.hostTeamSize = parseInt(hostTeamSize);
+    }
+    if (opponentDifficulty) {
+      whereClause.opponentDifficulty = opponentDifficulty;
+    }
+    if (isOpponent !== undefined) {
+      whereClause.isOpponent = isOpponent === 'true';
+    }
+
+    if (isTeamPlayer !== undefined) {
+      whereClause.isTeamPlayer = isTeamPlayer === 'true';
+    }
+    const paginationOptions = {};
+    if (limit) {
+      paginationOptions.limit = parseInt(limit);
+    }
+    if (offset) {
+      paginationOptions.offset = parseInt(offset);
+    }
+    const games = await Game.findAndCountAll({
+      where: whereClause,
+      ...paginationOptions,
+      order: [['gameDate', 'ASC'], ['gameTime', 'ASC']]
+    });
+    return res.status(200).json({
+      totalCount: games.count,
+      games: games.rows,
+      currentPage: offset ? Math.floor(parseInt(offset) / parseInt(limit)) + 1 : 1,
+      totalPages: limit ? Math.ceil(games.count / parseInt(limit)) : 1
+    });
+  }catch(error)
+  {
+    console.error('Error in searching game', error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+})
+
+router.get('/search/available',async(req,res)=>{
+  try{
+    const { sportType, startDate } = req.query;
+    const whereClause = {
+      gameStatus: 'open',
+      gameProgress: { [Op.ne]: 'completed' }
+    };
+    if (sportType) {
+      whereClause.sportType = sportType;
+    }
+    const today = startDate ? new Date(startDate) : new Date();
+    today.setHours(0, 0, 0, 0);
+    whereClause.gameDate = { [Op.gte]: today };
+    const availableGames = await Game.findAll({
+      where: whereClause,
+      order: [['gameDate', 'ASC'], ['gameTime', 'ASC']]
+    });
+    const gamesWithSpots = availableGames.filter(game => game.joinedPlayers < game.hostTeamSize);
+    return res.status(200).json({ 
+      games: gamesWithSpots,
+      count: gamesWithSpots.length
+    });
+  }catch(error)
+  {
+    console.error('Error in fetching available games', error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 })
