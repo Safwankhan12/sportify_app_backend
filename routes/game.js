@@ -410,6 +410,62 @@ router.delete('/removeplayer/:gameid',async(req,res)=>{
   }
 })
 
+router.delete('/leavegame/:gameid',async(req,res)=>{
+  try{
+    const gameid = req.params.gameid
+    const {userId} = req.body
+    const game = await Game.findOne({where : {uuid : gameid}})
+    if(!game)
+    {
+      return res.status(400).json({error : "Game not found"})
+    }
+    const user = await User.findOne({where : {uuid : userId}})
+    if(!user)
+    {
+      return res.status(400).json({error : "User not found"})
+    }
+    const hostUser = await User.findOne({where : {email : game.userEmail}})
+    if (hostUser && hostUser.uuid === userId) {
+      return res.status(400).json({ error: "Host cannot leave the game use cancel game feature instead" });
+    }
+    const gameRequest = await GameRequest.findOne({
+      where : {
+        gameId : gameid,
+        userId : userId,
+        status : 'approved'
+      }
+    })
+    if(!gameRequest)
+    {
+      return res.status(400).json({error : "You are not a part of this game"})
+    }
+    const playerRole = gameRequest.role
+    if (playerRole === "hostTeam") {
+      // Decrement joined players count
+      if (game.joinedPlayers > 0) {
+        game.joinedPlayers -= 1;
+      }
+      await game.save();
+    } else if (playerRole === "opponentTeam") {
+      // Clear opponent team ID if this player is the opponent
+      game.opponentTeamId = null;
+      await game.save();
+    }
+
+    // Delete the game request instead of updating status
+    await gameRequest.destroy();
+
+    return res.status(200).json({
+      message: "Successfully left the game",
+      role: playerRole
+    });
+  }catch(error)
+  {
+    console.error('Error in leaving game', error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+})
+
 router.get("/getuserrequests/:uuid", async (req, res) => {
   try {
     const userId = req.params.uuid;
