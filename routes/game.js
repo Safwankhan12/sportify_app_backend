@@ -7,6 +7,7 @@ const PrivateGameCode = require("../utils/PrivateCode");
 const nodemailer = require("nodemailer");
 const checkAndAwardBadges = require('../utils/BadgeService')
 const PrivateCodeNotification = require('../NotificationService/PrivateCodeNotificationService')
+const GameCancellationNotification = require('../NotificationService/GameCancellationNotificationService')
 const { Op } = require("sequelize");
 router.post(
   "/addnewgame",
@@ -301,22 +302,113 @@ router.get("/getusergames/:email", async (req, res) => {
   }
 });
 
-router.delete("/deletegame/:uuid", async (req, res) => {
+router.put("/cancelgame/:uuid", async (req, res) => {
   try {
-    const gameid = req.params.uuid;
-
-    const game = await Game.findOne({ where: { uuid: gameid } });
+    const gameId = req.params.uuid;
+    const {userId} = req.body
+    const game = await Game.findOne({ where: { uuid: gameId } });
     if (!game) {
       return res.status(400).json({ error: "Game not found" });
     }
-    await game.destroy({
-      truncate: true,
+    const hostUser = await User.findOne({ where: { email: game.userEmail } });
+    if (!hostUser) {
+      return res.status(400).json({ error: "Host User not found" });
+    }
+    if (hostUser.uuid !== userId) {
+      return res.status(403).json({ error: "Only the host can cancel the game" });
+    }
+    await game.update({
+      gameStatus: "closed",
+      gameProgress: "completed",
+    })
+    const approvedRequests = await GameRequest.findAll({
+      where : {
+        gameId : gameId,
+        status : 'approved'
+      },
+      include : [{
+        model : User,
+        as : 'Requester',
+        attributes : ['firstName', 'lastName', 'email']
+      }]
+    })
+    if(approvedRequests.length > 0)
+    {
+      await GameCancellationNotification(approvedRequests, game)
+    }
+    return res.status(200).json({ 
+      message: "Game cancelled successfully",
+      game: game,
+      approvedRequests : approvedRequests
     });
-    return res.status(200).json({ message: "Game deleted successfully" });
   } catch (err) {
-    console.error(err);
+    console.error('Error in cancelling game', err);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
+router.delete('/removeplayer/:gameid',async(req,res)=>{
+  try{
+    const gameid = req.params.gameid
+    const {hostId,playerId} = req.body
+    const game = await Game.findOne({where : {uuid : gameid}})
+    if(!game)
+    {
+      return res.status(400).json({error : "Game not found"})
+    }
+    const hostUser = await User.findOne({where : {email : game.userEmail}})
+    if (!hostUser)
+    {
+      return res.status(400).json({error : "Host User not found"})
+    }
+    if (hostUser.uuid !== hostId)
+    {
+      return res.status(403).json({error : "Only the host can remove players"})
+    }
+    const playerRequest = await GameRequest.findOne({
+      where : {
+        gameId : gameid,
+        userId : playerId,
+        status : 'approved'
+      }
+    })
+    if (!playerRequest)
+    {
+      return res.status(400).json({error : "Player not found or not approved"})
+    }
+    const player = await User.findOne({ 
+      where: { uuid: playerId },
+      attributes: ['firstName', 'lastName', 'email', 'uuid'] 
+    });
+
+    const playerRole = playerRequest.role;
+
+    // Handle player removal based on their role
+    if (playerRole === "hostTeam") {
+      // Decrement joined players count
+      if (game.joinedPlayers > 0) {
+        game.joinedPlayers -= 1;
+      }
+      await game.save();
+    } else if (playerRole === "opponentTeam") {
+      // Clear opponent team ID if this player is the opponent
+      game.opponentTeamId = null;
+      await game.save();
+    }
+
+    // Delete the game request instead of updating status
+    await playerRequest.destroy();
+
+    return res.status(200).json({
+      message: "Player removed successfully",
+      player: player,
+      role: playerRole
+    });
+  }catch(error)
+  {
+    console.error('Error in removing player', error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+})
 
 router.get("/getuserrequests/:uuid", async (req, res) => {
   try {
