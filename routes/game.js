@@ -334,7 +334,7 @@ router.put("/cancelgame/:uuid", async (req, res) => {
     })
     if(approvedRequests.length > 0)
     {
-      await GameCancellationNotification(approvedRequests, game)
+       GameCancellationNotification(approvedRequests, game)
     }
     return res.status(200).json({ 
       message: "Game cancelled successfully",
