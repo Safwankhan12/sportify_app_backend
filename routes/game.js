@@ -302,7 +302,7 @@ router.get("/getusergames/:email", async (req, res) => {
   }
 });
 
-router.put("/cancelgame/:uuid", async (req, res) => {
+router.delete("/cancelgame/:uuid", async (req, res) => {
   try {
     const gameId = req.params.uuid;
     const {userId} = req.body
@@ -317,10 +317,6 @@ router.put("/cancelgame/:uuid", async (req, res) => {
     if (hostUser.uuid !== userId) {
       return res.status(403).json({ error: "Only the host can cancel the game" });
     }
-    await game.update({
-      gameStatus: "closed",
-      gameProgress: "completed",
-    })
     const approvedRequests = await GameRequest.findAll({
       where : {
         gameId : gameId,
@@ -336,9 +332,17 @@ router.put("/cancelgame/:uuid", async (req, res) => {
     {
        GameCancellationNotification(approvedRequests, game)
     }
+    await GameRequest.destroy({
+      where : {gameId : gameId}
+    })
+    await GameResult.destroy({
+      where : {gameId : gameId}
+    })
+    const gameInfo = game
+    await game.destroy();
     return res.status(200).json({ 
-      message: "Game cancelled successfully",
-      game: game,
+      message: "Game cancelled and removed successfully",
+      game: gameInfo,
       approvedRequests : approvedRequests
     });
   } catch (err) {
