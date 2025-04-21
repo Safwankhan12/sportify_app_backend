@@ -6,6 +6,7 @@ const { Booking, User, Venue } = require("../models");
 const { Op } = require("sequelize");
 const { route } = require("./auth");
 const sendBookingConfirmNotification = require('../NotificationService/BookingConfirmNotificationService')
+const sendBookingCancelNotification= require('../NotificationService/BookingCancellationNotificationService')
 
 // First, we need to modify the addnewbooking route to check for overlapping times
 // This function checks if two time ranges overlap
@@ -365,22 +366,121 @@ router.get("/getbookingbystatus/:email", async (req, res) => {
   }
 });
 
-router.delete("/deletebooking/:uuid", async (req, res) => {
+router.put("/cancelbookinguser/:uuid", async (req, res) => {
   try {
-    const bookingid = req.params.uuid;
-    const booking = await Booking.findOne({ where: { uuid: bookingid } });
+    const bookingId = req.params.uuid
+    const {userEmail} = req.body
+    const booking = await Booking.findOne({ where: { uuid: bookingId } });
     if (!booking) {
-      return res.status(400).json({ error: "No booking found" });
+      return res.status(404).json({ error: "No booking found" });
     }
-    const venue = await Venue.findOne({ where: { uuid: booking.venueId } });
-    await Venue.update(
-      { status: "Available" },
-      { where: { uuid: venue.uuid } }
-    );
-    await booking.destroy({ truncate: true });
-    return res.status(200).json({ message: "Booking deleted successfully" });
+    if (booking.userEmail !== userEmail)
+    {
+      return res.status(403).json({ error: "You can only cancel your own bookings" });
+    }
+    if (booking.status === 'Rejected')
+    {
+      return res.status(400).json({ error: "This booking is already cancelled" });
+    }
+    await Booking.update({
+      status :'Rejected'
+    }, {where : {uuid : bookingId}})
+
+    if (booking.status === "Confirmed") {
+      const venue = await Venue.findOne({ where: { uuid: booking.venueId } });
+      if (venue) {
+        // Check if there are other confirmed bookings for this venue
+        const otherConfirmedBookings = await Booking.findOne({
+          where: {
+            venueId: booking.venueId,
+            status: "Confirmed",
+            uuid: { [Op.ne]: bookingId } // Exclude the current booking
+          }
+        });
+        
+        if (!otherConfirmedBookings) {
+          // If no other confirmed bookings, set venue to Available
+          await Venue.update({ status: "Available" }, { where: { uuid: venue.uuid } });
+        }
+      }
+    }
+    sendBookingCancelNotification(booking.userEmail, booking.bookingDate, booking.bookingTime, booking.venueName)
+    return res.status(200).json({ message: "Booking cancelled successfully" });
   } catch (err) {
     console.error(err);
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
+
+router.put('/cancelbookingadmin/:uuid',async(req,res)=>{
+  try {
+    const bookingId = req.params.uuid;
+    const { adminEmail } = req.body;
+    
+    // Verify admin
+    const admin = await User.findOne({ where: { email: adminEmail } });
+    if (!admin) {
+      return res.status(404).json({ error: "Admin not found" });
+    }
+    
+    // Find the booking
+    const booking = await Booking.findOne({ where: { uuid: bookingId } });
+    if (!booking) {
+      return res.status(404).json({ error: "Booking not found" });
+    }
+    
+    // Find venue associated with admin
+    const venue = await Venue.findOne({ where: { ownerId: admin.uuid } });
+    if (!venue) {
+      return res.status(403).json({ error: "No venue associated with this admin" });
+    }
+    
+    // Check if booking belongs to admin's venue
+    if (booking.venueId !== venue.uuid) {
+      return res.status(403).json({ error: "You can only cancel bookings for your own venues" });
+    }
+    
+    // Check if booking is already rejected
+    if (booking.status === "Rejected") {
+      return res.status(400).json({ error: "Booking is already cancelled" });
+    }
+    
+    // Update booking status to Rejected and add cancellation reason if provided
+    const updateData = { 
+      status: "Rejected"
+    };
+    
+   
+    
+    await Booking.update(updateData, { where: { uuid: bookingId } });
+    
+    // Update venue status if needed
+    if (booking.status === "Confirmed") {
+      // Check if there are other confirmed bookings for this venue
+      const otherConfirmedBookings = await Booking.findOne({
+        where: {
+          venueId: booking.venueId,
+          status: "Confirmed",
+          uuid: { [Op.ne]: bookingId } // Exclude the current booking
+        }
+      });
+      
+      if (!otherConfirmedBookings) {
+        // If no other confirmed bookings, set venue to Available
+        await Venue.update({ status: "Available" }, { where: { uuid: venue.uuid } });
+      }
+    }
+    
+    // You could notify the user about the cancellation
+      sendBookingCancelNotification(booking.userEmail, booking.bookingDate, booking.bookingTime, booking.venueName);
+    
+    return res.status(200).json({ 
+      message: "Booking cancelled successfully",
+      booking: booking
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+})
 module.exports = router;
