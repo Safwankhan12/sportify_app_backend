@@ -47,6 +47,6 @@ app.use('/api/chat', require('./routes/chat'))
 app.use('/api/badge', require('./routes/badge'))
 
 // Start the server
-server.listen(port, () => {
+server.listen(port, '0.0.0.0',() => {
   console.log(`Server running on port ${port}`);
 });
