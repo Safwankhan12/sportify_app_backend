@@ -202,6 +202,25 @@ router.get('/leaderboard/:uuid/rank', async(req,res)=>{
   }
 })
 
+router.post('/storefcmtoken', async(req,res)=>{
+  try{
+    const {userUUID, fcmToken} = req.body
+    const user = await User.findOne({where: {uuid: userUUID}})
+    if (!user)
+    {
+      return res.status(400).json({error: "No user found"})
+    }
+    await user.update({
+      fcm_token: fcmToken
+    })
+    return res.status(200).json({message: "FCM token stored successfully"})
+  }catch(error)
+  {
+    console.error('Error storing FCM token', error)
+    return res.status(500).json({error: "Internal Server Error"})
+  }
+})
+
 // router.get('/profileinfo', passport.authenticate('jwt', { session: false }), (req, res) => {
 //     return res.status(200).send({
 //       success: true,
