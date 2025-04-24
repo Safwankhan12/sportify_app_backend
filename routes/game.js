@@ -9,6 +9,7 @@ const checkAndAwardBadges = require('../utils/BadgeService')
 const PrivateCodeNotification = require('../NotificationService/PrivateCodeNotificationService')
 const GameCancellationNotification = require('../NotificationService/GameCancellationNotificationService')
 const SendApproveRejectGameNotification = require('../FireBaseNotifications/ApproveRejectGameNotification')
+const sendJoinGameNotification = require('../FireBaseNotifications/SendJoinGameNotification')
 const { Op } = require("sequelize");
 router.post(
   "/addnewgame",
@@ -168,6 +169,7 @@ router.post("/joingame", async (req, res) => {
       role: role,
       hostId: host.uuid,
     });
+    sendJoinGameNotification(host.fcm_token, user.firstName)
     return res
       .status(200)
       .json({ message: "Request sent successfully", request: request, UserName : user.firstName });
