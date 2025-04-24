@@ -8,6 +8,7 @@ const nodemailer = require("nodemailer");
 const checkAndAwardBadges = require('../utils/BadgeService')
 const PrivateCodeNotification = require('../NotificationService/PrivateCodeNotificationService')
 const GameCancellationNotification = require('../NotificationService/GameCancellationNotificationService')
+const SendApproveRejectGameNotification = require('../FireBaseNotifications/ApproveRejectGameNotification')
 const { Op } = require("sequelize");
 router.post(
   "/addnewgame",
@@ -225,6 +226,7 @@ router.put("/approverequest/:uuid", async (req, res) => {
       }
     }
     await request.update({ status });
+    SendApproveRejectGameNotification(user.fcm_token, game, status)
     return res.status(200).json({
       message: `Request ${status} for role ${request.role} successfully`,
       userUUID : user.uuid
