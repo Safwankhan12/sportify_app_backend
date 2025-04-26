@@ -12,9 +12,13 @@ const io = new Server(server, { cors: { origin: "*" } });
 //Imporing cron jobs
 const reduceActivityPoints = require('./cron-jobs/reduceActivityPoints')
 const checkBadgeEligibility = require('./cron-jobs/checkBadgeEligibility')
+const {initGameNotificationScheduler} = require('./cron-jobs/gameNotificationScheduler')
+const setupGameEndScheduler = require('./cron-jobs/gameEndNotificationSchedule')
 require('./cron-jobs/updateLeaderboard')
 reduceActivityPoints()
 checkBadgeEligibility()
+initGameNotificationScheduler()
+setupGameEndScheduler()
 
 // initializing socket.io
 setupSocket(io)
