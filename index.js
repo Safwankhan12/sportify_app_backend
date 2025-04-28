@@ -1,11 +1,13 @@
 const Db = require("./DatabaseConnection");
 Db(); // Initialize your database connection
 const express = require("express");
+const compression = require('compression')
 const { Server } = require('socket.io');
 const http = require('http')
 const setupSocket = require('./sockets/chatSocket')
 const setupGameSocket = require('./sockets/gameSocket')
 const app = express();
+app.use(compression()) // Enable compression for all routes
 const server = http.createServer(app)
 const io = new Server(server, { cors: { origin: "*" } });
 
