@@ -25,7 +25,7 @@ module.exports = {
         address : "Umar Minhas Futsal Ground, W4PM+XG2, Unnamed Road, University Of Karachi, Karachi, Karachi City, Sindh",
         sports : "Football and cricket",
         availability : "4 to 6",
-        price : 5000,
+        price : 3000,
         ownerId : "82593690-5c20-4e30-5e17-30ceeh15j2d7"
       },
       {
@@ -36,7 +36,7 @@ module.exports = {
         address : "Umar Minhas Futsal Ground, W4PM+XG2, Unnamed Road, University Of Karachi, Karachi, Karachi City, Sindh",
         sports : "Football and cricket",
         availability : "4 to 6",
-        price : 5000,
+        price : 2200,
         ownerId : "82595470-5h20-4f30-ae17-30ceed15c2d7"
       }
     ])
