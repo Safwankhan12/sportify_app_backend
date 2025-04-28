@@ -45,7 +45,7 @@ module.exports = {
       },
       totalAmount: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
       status : {
         type : Sequelize.ENUM('Pending','Confirmed','Rejected'),
