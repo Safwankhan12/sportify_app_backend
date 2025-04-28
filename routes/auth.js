@@ -13,7 +13,7 @@ const passport = require("passport");
 const hashPassword = require("../utils/helpers");
 const checkAndAwardBadges = require("../utils/BadgeService");
 const sendPasswordNotification = require('../NotificationService/ForgotPasswordNotificationService')
-
+const admin = require('../FirebaseAdmin/firebase')
 // const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN)
 // const TWILIO_PHONE = process.env.TWILIO_PHONE
 
@@ -77,6 +77,17 @@ router.post(
     //     from : '+18312760404'
     // })
     NewUser.save();
+    await admin.firestore().collection('users').doc(NewUser.uuid).set({
+      name: req.body.firstName || 'User',
+      email: req.body.email || '',
+      photoUrl: req.body.photoUrl ? req.body.photoUrl : null,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      lastActive: admin.firestore.FieldValue.serverTimestamp(),
+      isOnline: false,
+      bio: '',
+    }).then(response => {
+      console.log('User added to Firestore:', response);
+    })
     return res
       .status(200)
       .json({
