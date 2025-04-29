@@ -61,8 +61,42 @@ module.exports = {
         type: Sequelize.DATE,
       },
     });
+    await queryInterface.addIndex('Bookings', ['venueId'], {
+      name: 'bookings_venue_id_idx'
+    });
+    
+    // Index on userEmail - Used for finding bookings by user
+    await queryInterface.addIndex('Bookings', ['userEmail'], {
+      name: 'bookings_user_email_idx'
+    });
+    
+    // Compound index on venueId and status - Used in getbookingbystatus and other routes
+    await queryInterface.addIndex('Bookings', ['venueId', 'status'], {
+      name: 'bookings_venue_status_idx'
+    });
+    
+    // Compound index on venueName and bookingDate - Used in overlap checking
+    await queryInterface.addIndex('Bookings', ['venueName', 'bookingDate'], {
+      name: 'bookings_venue_date_idx'
+    });
+    
+    // Index on status - Used in many queries 
+    await queryInterface.addIndex('Bookings', ['status'], {
+      name: 'bookings_status_idx'
+    });
+    
+    // Compound index on venueName, bookingDate, and status - Used specifically in time overlap checks
+    await queryInterface.addIndex('Bookings', ['venueName', 'bookingDate', 'status'], {
+      name: 'bookings_venue_date_status_idx'
+    });
   },
   async down(queryInterface, Sequelize) {
+    await queryInterface.removeIndex('Bookings', 'bookings_venue_id_idx');
+    await queryInterface.removeIndex('Bookings', 'bookings_user_email_idx');
+    await queryInterface.removeIndex('Bookings', 'bookings_venue_status_idx');
+    await queryInterface.removeIndex('Bookings', 'bookings_venue_date_idx');
+    await queryInterface.removeIndex('Bookings', 'bookings_status_idx');
+    await queryInterface.removeIndex('Bookings', 'bookings_venue_date_status_idx');
     await queryInterface.dropTable("Bookings");
   },
 };
