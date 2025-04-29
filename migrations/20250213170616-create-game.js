@@ -100,8 +100,50 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
+    await queryInterface.addIndex('Games', ['userEmail'], {
+      name: 'games_user_email_idx'
+    });
+    
+    await queryInterface.addIndex('Games', ['gameDate'], {
+      name: 'games_game_date_idx'
+    });
+    
+    await queryInterface.addIndex('Games', ['sportType'], {
+      name: 'games_sport_type_idx'
+    });
+    
+    await queryInterface.addIndex('Games', ['gameStatus'], {
+      name: 'games_game_status_idx'
+    });
+    
+    await queryInterface.addIndex('Games', ['gameProgress'], {
+      name: 'games_game_progress_idx'
+    });
+    
+    // Composite index for game date and time (useful for sorting and range queries)
+    await queryInterface.addIndex('Games', ['gameDate', 'gameTime'], {
+      name: 'games_date_time_idx'
+    });
+    
+    // Composite index for finding available games efficiently
+    await queryInterface.addIndex('Games', ['gameStatus', 'gameProgress', 'gameDate'], {
+      name: 'games_available_idx'
+    });
+    
+    // Index for venue searches
+    await queryInterface.addIndex('Games', ['venueName'], {
+      name: 'games_venue_name_idx'
+    });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Games');
+    await queryInterface.removeIndex('Games', 'games_user_email_idx');
+    await queryInterface.removeIndex('Games', 'games_game_date_idx');
+    await queryInterface.removeIndex('Games', 'games_sport_type_idx');
+    await queryInterface.removeIndex('Games', 'games_game_status_idx');
+    await queryInterface.removeIndex('Games', 'games_game_progress_idx');
+    await queryInterface.removeIndex('Games', 'games_date_time_idx');
+    await queryInterface.removeIndex('Games', 'games_available_idx');
+    await queryInterface.removeIndex('Games', 'games_venue_name_idx');
+     await queryInterface.dropTable('Games');
   }
 };
