@@ -6,8 +6,10 @@ const { Server } = require('socket.io');
 const http = require('http')
 const setupSocket = require('./sockets/chatSocket')
 const setupGameSocket = require('./sockets/gameSocket')
+const helmet = require('helmet')
 const app = express();
 app.use(compression()) // Enable compression for all routes
+app.use(helmet()) // Enable security headers
 const server = http.createServer(app)
 const io = new Server(server, { cors: { origin: "*" } });
 
