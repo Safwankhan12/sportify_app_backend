@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const { Venue, User } = require("../models");
+const axios = require('axios')
 const geolib = require("geolib");
-const { route } = require("./auth");
 
 router.post(
   "/addnewvenue",
@@ -120,6 +120,28 @@ router.get('/getvenue/:uuid', async(req,res)=>{
     }
 })
 
+router.get('/places', async(req,res)=>{
+  const {q} = req.query
+  try{
+    const response = await axios.get('https://nominatim.openstreetmap.org/search',{
+      params : {
+        q : q, 
+        format: 'json',
+        addressdetails: 1,
+        limit: 5,
+        countrycodes: 'pk'
+      },
+      headers : {
+        'User-Agent': 'Sportify_App'
+      }
+    })
+    return res.status(200).json({places : response.data})
+  }catch(error)
+  {
+    console.error('Error fetching places:', error);
+    return res.status(500).json({ message : 'Internal server error'});
+  }
+})
 
 
 module.exports = router;
