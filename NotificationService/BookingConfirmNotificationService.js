@@ -2,7 +2,7 @@ require('dotenv').config()
 const {User, Booking, Notification} = require('../models')
 const nodemailer = require('nodemailer')
 
-const sendBookingConfirmNotification = async (userEmail, bookingDate, bookingTime, venueName)=>{
+const sendBookingConfirmNotification = async (userEmail, bookingDate, bookingTime, venueName, VenuePrice, OwnerAccNo, OwnerPhoneNo)=>{
     try{
         const user = await User.findOne({where: {email: userEmail}})
         if (!user){
@@ -31,7 +31,11 @@ const sendBookingConfirmNotification = async (userEmail, bookingDate, bookingTim
             <div style="text-align: center; font-family: Arial, sans-serif;">
             <h2>🎉 Booking Confirmed! 🎉</h2>
             <p>Your booking has been confirmed for Venue ${venueName} on ${bookingDate} at time ${bookingTime}.</p>
-            <p>- Team Spotify</p>
+            <p>Your Charges Per Hour are Rs ${VenuePrice}</p>
+            <p>Ground Owner Account No : ${OwnerAccNo}</p>
+            <p>Ground Owner Phone No : ${OwnerPhoneNo}</p>
+            <p>Once the payment is made please send the screenshot of your payment to above mentioned Phone No.</p>
+            <p>- Team Sportify</p>
             </div>
             `
         })

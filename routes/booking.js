@@ -180,7 +180,11 @@ router.put('/confirmbooking/:uuid', async(req, res) => {
     if (!venue) {
       return res.status(400).json({ error: "No Venue found" });
     }
-    
+    const venueOwner = await User.findOne({ where: { uuid: venue.ownerId } });
+    if (!venueOwner)
+    {
+      return res.status(400).json({ error: "No Venue Owner found" });
+    }
     if (status === "Confirmed") {
       // Before confirming, check for time overlaps with existing confirmed bookings
       const requestedTime = timeToMinutes(booking.bookingTime);
@@ -215,7 +219,7 @@ router.put('/confirmbooking/:uuid', async(req, res) => {
       
       await Booking.update({ status: "Confirmed" }, { where: { uuid: bookingid } });
       await Venue.update({ status: "Booked" }, { where: { uuid: venue.uuid } });
-      await sendBookingConfirmNotification(booking.userEmail, booking.bookingDate, booking.bookingTime, booking.venueName);
+       sendBookingConfirmNotification(booking.userEmail, booking.bookingDate, booking.bookingTime, booking.venueName, venue.price, '3434345AccNo', venueOwner.phoneNo);
       return res.status(200).json({ message: "Booking confirmed" });
     }
     
