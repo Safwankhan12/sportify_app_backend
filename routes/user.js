@@ -8,6 +8,7 @@ const isAdmin = require("../middlewares/authenticateAdminMiddleware");
 const passport = require("passport");
 const { route } = require("./game");
 const {getLeaderboardCache} = require('../cron-jobs/updateLeaderboard')
+const admin = require('../FirebaseAdmin/firebase')
 
 router.post(
   "/addnewuser",
@@ -122,6 +123,9 @@ router.put("/editprofile/:uuid", async (req, res) => {
       address: req.body.address,
       profilePicture: req.body.profilePicture,
     });
+    await admin.firestore().collection('users').doc(user.uuid).update({
+      photoUrl: req.body.profilePicture,
+    })
     return res.status(200).json({ message: "Profile updated successfully" });
   } catch (err) {
     console.error(err);
