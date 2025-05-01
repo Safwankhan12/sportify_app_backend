@@ -219,7 +219,7 @@ router.put('/confirmbooking/:uuid', async(req, res) => {
       
       await Booking.update({ status: "Confirmed" }, { where: { uuid: bookingid } });
       await Venue.update({ status: "Booked" }, { where: { uuid: venue.uuid } });
-       sendBookingConfirmNotification(booking.userEmail, booking.bookingDate, booking.bookingTime, booking.venueName, venue.price, '3434345AccNo', venueOwner.phoneNo);
+       sendBookingConfirmNotification(booking.userEmail, booking.bookingDate, booking.bookingTime, booking.venueName, venue.price, venueOwner.accountNo, venueOwner.phoneNo);
       return res.status(200).json({ message: "Booking confirmed" });
     }
     

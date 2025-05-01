@@ -77,6 +77,10 @@ module.exports = {
         type : Sequelize.ENUM('admin', 'user'),
         defaultValue : 'user'
       },
+      accountNo : {
+        type : Sequelize.STRING,
+        allowNull : true
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
