@@ -51,8 +51,17 @@ router.post(
     const userPhone = await User.findOne({
       where: { phoneNo: req.body.phoneNo },
     });
-    if (userEmail || userPhone) {
-      return res.status(404).json({ error: "User already exists" });
+    const userName = await User.findOne({where : {userName : req.body.userName}})
+    if (userEmail) {
+      return res.status(404).json({ error: "User already exists with this email" });
+    }
+    if (userPhone)
+    {
+      return res.status(404).json({ error: "User already exists with this phone number" });
+    }
+    if (userName)
+    {
+      return res.status(404).json({ error: "User already exists with this username" });
     }
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -64,6 +73,7 @@ router.post(
     const NewUser = await User.create({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
+      userName: req.body.userName,
       email: req.body.email,
       password: password,
       phoneNo: req.body.phoneNo,

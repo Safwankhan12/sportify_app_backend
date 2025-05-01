@@ -21,6 +21,11 @@ module.exports = {
       lastName: {
         type: Sequelize.STRING
       },
+      userName :  {
+        type : Sequelize.STRING,
+        allowNull : false,
+        unique : true
+      },
       email: {
         type: Sequelize.STRING,
         allowNull : false,
