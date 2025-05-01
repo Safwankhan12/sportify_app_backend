@@ -90,6 +90,7 @@ router.post(
     await admin.firestore().collection('users').doc(NewUser.uuid).set({
       name: req.body.firstName || 'User',
       email: req.body.email || '',
+      userName : req.body.userName || '',
       photoUrl: req.body.photoUrl ? req.body.photoUrl : null,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       lastActive: admin.firestore.FieldValue.serverTimestamp(),
