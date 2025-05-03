@@ -90,6 +90,7 @@ const checkEndedGames = async () => {
         gameProgress: {
           [Op.or]: ['in_progress', null]
         },
+        endNotificationSent: false,
         // Ensure we only check games that have already started
         [Op.or]: [
           {

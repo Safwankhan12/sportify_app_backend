@@ -34,6 +34,11 @@ const notifyGameHost = async(gameId)=>{
             console.error('Game not found. Cannot send notification.')
             return false
         }
+        if (game.endNotificationSent)
+        {
+            console.log(`Game end notification already sent for game ${gameId}.`)
+            return false
+        }
         const hostUser = await User.findOne({where : {email : game.userEmail}})
         if (!hostUser) {
             console.error('Host user not found. Cannot send notification.')
@@ -42,6 +47,7 @@ const notifyGameHost = async(gameId)=>{
         if (hostUser.fcm_token)
         {
             await sendGameEndNotification(hostUser.fcm_token, game.gameName)
+            await game.update({endNotificationSent : true})
             return true
         }else{
             console.error('Host user does not have a valid FCM token. Cannot send notification.')
