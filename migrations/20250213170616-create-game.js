@@ -96,6 +96,14 @@ module.exports = {
         allowNull : false,
         defaultValue : false
       },
+      latitude : {
+        type : Sequelize.DOUBLE,
+        allowNull : true
+      },
+      longitude : {
+        type : Sequelize.DOUBLE,
+        allowNull : true
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

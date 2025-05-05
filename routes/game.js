@@ -85,7 +85,9 @@ router.post(
         hostTeamSize: req.body.hostTeamSize,
         opponentDifficulty: req.body.opponentDifficulty ? req.body.opponentDifficulty : null,
         isOpponent : req.body.isOpponent,
-        isTeamPlayer : req.body.isTeamPlayer
+        isTeamPlayer : req.body.isTeamPlayer,
+        latitude : req.body.latitude ? req.body.latitude : null,
+        longitude : req.body.longitude ? req.body.longitude : null,
       });
       if (req.body.visibility === "private") {
         await PrivateCodeNotification(user.email, joinCodeGame)
