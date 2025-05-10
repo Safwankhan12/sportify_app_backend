@@ -1,6 +1,5 @@
 require("dotenv").config();
 const express = require("express");
-const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
@@ -9,13 +8,12 @@ const { Token } = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
-//const twilio = require('twilio')
 const hashPassword = require("../utils/helpers");
 const checkAndAwardBadges = require("../utils/BadgeService");
 const sendPasswordNotification = require('../NotificationService/ForgotPasswordNotificationService')
+const EmailVerification = require('../NotificationService/SendEmailVerificationOtp')
 const admin = require('../FirebaseAdmin/firebase')
-// const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN)
-// const TWILIO_PHONE = process.env.TWILIO_PHONE
+
 
 router.post(
   "/signup",
@@ -67,8 +65,8 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    //const otp = crypto.randomInt(1000,9999)
-    //const opteexpiration = Date.now() + 5 *60 *1000
+    const otp = crypto.randomInt(1000,9999)
+    const opteexpiration = Date.now() + 10 *60 *1000
     const password = hashPassword(req.body.password);
     const NewUser = await User.create({
       firstName: req.body.firstName,
@@ -77,15 +75,10 @@ router.post(
       email: req.body.email,
       password: password,
       phoneNo: req.body.phoneNo,
-      //resetCoded : otp,
-      //resetCodeExpiration : opteexpiration,
+      resetCode : otp,
+      resetCodeExpiration : opteexpiration,
       isPhoneVerified: false,
     });
-    // await client.messages.create({
-    //     body : `Your verification code is ${otp}`,
-    //     to: `+923136361204`,
-    //     from : '+18312760404'
-    // })
     NewUser.save();
     await admin.firestore().collection('users').doc(NewUser.uuid).set({
       name: req.body.firstName || 'User',
@@ -99,38 +92,39 @@ router.post(
     }).then(response => {
       console.log('User added to Firestore:', response);
     })
+    EmailVerification(NewUser.email, otp)
     return res
       .status(200)
       .json({
-        message: "User added successfully Otp send to number for verification",
+        message: "User added successfully Otp send to email for verification",
       });
   }
 );
 
-// router.post('/verify-otp',async(req,res)=>{
-//     try{
-//         const {email,otp} = req.body
-//         const user = await User.findOne({where : {email : email}})
-//         if (!user)
-//         {
-//             return res.status(404).json({error : 'User not found'})
-//         }
-//         if (user.resetCode !== otp || user.resetCodeExpiration < Date.now())
-//         {
-//             return res.status(400).json({error : 'Invalid or expired otp'})
-//         }
+router.post('/verify-otp',async(req,res)=>{
+    try{
+        const {email,otp} = req.body
+        const user = await User.findOne({where : {email : email}})
+        if (!user)
+        {
+            return res.status(404).json({error : 'User not found'})
+        }
+        if (user.resetCode != otp || user.resetCodeExpiration < Date.now())
+        {
+            return res.status(400).json({error : 'Invalid or expired otp'})
+        }
 
-//         await user.update({
-//             isPhoneVerified : true,
-//             resetCode : null,
-//             resetCodeExpiration : null
-//         })
-//         return res.status(200).json({message : 'Phone verified successfully'})
-//     }catch(err)
-//     {
-//         console.error(err)
-//     }
-// })
+        await user.update({
+            isPhoneVerified : true,
+            resetCode : null,
+            resetCodeExpiration : null
+        })
+        return res.status(200).json({message : 'Email verified successfully'})
+    }catch(err)
+    {
+        console.error(err)
+    }
+})
 
 router.post("/login", async (req, res) => {
   try {
@@ -148,14 +142,14 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Invalid credentials" });
     }
     await Token.destroy({where : {userId : user.id}})
+    if (!user.isPhoneVerified)
+    {
+       return res.status(400).json({error : 'Email not verified'})
+    }
     await user.update({
       activityPoints: user.activityPoints + 5,
       loginCount: user.loginCount + 1,
     });
-    // if (!user.isPhoneVerified)
-    // {
-    //     return res.status(400).json({error : 'Phone not verified'})
-    // }
     const payload = {
       email: user.email,
       id: user.id,
