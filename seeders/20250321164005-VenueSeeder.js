@@ -15,7 +15,9 @@ module.exports = {
         sports : "Football and cricket",
         availability : "4 to 6",
         price : 5000,
-        ownerId : "82593690-5c20-4e30-ae17-30ceed15c2d7"
+        ownerId : "82593690-5c20-4e30-ae17-30ceed15c2d7",
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
         uuid : Sequelize.literal('UUID()'),
@@ -26,7 +28,9 @@ module.exports = {
         sports : "Football and cricket",
         availability : "4 to 6",
         price : 3000,
-        ownerId : "82593690-5c20-4e30-5e17-30ceeh15j2d7"
+        ownerId : "82593690-5c20-4e30-5e17-30ceeh15j2d7",
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
         uuid : Sequelize.literal('UUID()'),
@@ -37,7 +41,9 @@ module.exports = {
         sports : "Football and cricket",
         availability : "4 to 6",
         price : 2200,
-        ownerId : "82595470-5h20-4f30-ae17-30ceed15c2d7"
+        ownerId : "82595470-5h20-4f30-ae17-30ceed15c2d7",
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
         uuid : Sequelize.literal('UUID()'),
@@ -48,7 +54,9 @@ module.exports = {
         sports : "Badminton",
         availability : "4 to 6",
         price : 3500,
-        ownerId : "82595470-5h20-4f30-ae17-30cfe51522d7"
+        ownerId : "82595470-5h20-4f30-ae17-30cfe51522d7",
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
         uuid : Sequelize.literal('UUID()'),
@@ -59,7 +67,9 @@ module.exports = {
         sports : "cricket",
         availability : "4 to 6",
         price : 6000,
-        ownerId : "82335470-5h20-4f30-jk17-30ceed15c2d7"
+        ownerId : "82335470-5h20-4f30-jk17-30ceed15c2d7",
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
     ])
   },
