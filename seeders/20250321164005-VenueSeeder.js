@@ -5,7 +5,7 @@ const { UUID } = require('sequelize');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.bulkInsert('Venues',[
+    await queryInterface.bulkInsert('venues',[
       {
         uuid : Sequelize.literal('UUID()'),
         name : "Umar Minhas futsal ground",

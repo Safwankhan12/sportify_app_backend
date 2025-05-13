@@ -5,7 +5,7 @@ const hashPassword = require("../utils/helpers");
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.bulkInsert(
-      "Users",
+      "users",
       [
         {
           uuid: "82593690-5c20-4e30-ae17-30ceed15c2d7",
