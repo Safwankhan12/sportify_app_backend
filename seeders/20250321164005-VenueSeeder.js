@@ -38,6 +38,28 @@ module.exports = {
         availability : "4 to 6",
         price : 2200,
         ownerId : "82595470-5h20-4f30-ae17-30ceed15c2d7"
+      },
+      {
+        uuid : Sequelize.literal('UUID()'),
+        name : "National Coaching Center",
+        latitude : 24.8946326,
+        longitude : 67.0755218,
+        address : "Umar Minhas Futsal Ground, W4PM+XG2, Unnamed Road, University Of Karachi, Karachi, Karachi City, Sindh",
+        sports : "Badminton",
+        availability : "4 to 6",
+        price : 3500,
+        ownerId : "82595470-5h20-4f30-ae17-30cfe51522d7"
+      },
+      {
+        uuid : Sequelize.literal('UUID()'),
+        name : "Imran Khan ground",
+        latitude : 24.920411,
+        longitude : 67.0941117,
+        address : "Umar Minhas Futsal Ground, W4PM+XG2, Unnamed Road, University Of Karachi, Karachi, Karachi City, Sindh",
+        sports : "cricket",
+        availability : "4 to 6",
+        price : 6000,
+        ownerId : "82335470-5h20-4f30-jk17-30ceed15c2d7"
       }
     ])
   },
