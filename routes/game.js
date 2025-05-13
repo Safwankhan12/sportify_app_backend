@@ -805,32 +805,79 @@ router.get('/search/available',async(req,res)=>{
 })
 
 
-router.get('/getnearbygames',async(req,res)=>{
-  try{
-    const {latitude, longitude, distance} = req.query
+router.get('/getnearbygames', async (req, res) => {
+  try {
+    const { latitude, longitude, distance } = req.query;
+    
     if (!latitude || !longitude || !distance) {
-      return res.status(400).json({ error: "Please provide latitude and longitude and distance" });
+      return res.status(400).json({ error: "Please provide latitude, longitude, and distance" });
     }
-    const userLocation = { latitude: parseFloat(latitude), longitude: parseFloat(longitude) };
-    const allgames = await Game.findAll();
-    if (!allgames) {
-      return res.status(400).json({ error: "No games found" });
+    
+    
+    const userLat = parseFloat(latitude);
+    const userLng = parseFloat(longitude);
+    const maxDistance = parseFloat(distance); // Distance in meters
+    
+    
+    if (isNaN(userLat) || isNaN(userLng) || isNaN(maxDistance)) {
+      return res.status(400).json({ error: "Invalid coordinate or distance values" });
     }
-    const nearbyGames = allgames.filter(game => 
-      geolib.getDistance(userLocation , {
-        latitude : game.latitude,
-        longitude : game.longitude
-      }) <= distance
-    )
+    
+    const userLocation = { 
+      latitude: userLat, 
+      longitude: userLng 
+    };
+    
+    const allGames = await Game.findAll();
+    
+    if (!allGames || allGames.length === 0) {
+      return res.status(404).json({ message: "No games found in the database" });
+    }
+    
+    
+    const nearbyGames = allGames.filter(game => {
+      const gameLat = parseFloat(game.latitude);
+      const gameLng = parseFloat(game.longitude);
+      
+      if (isNaN(gameLat) || isNaN(gameLng)) {
+        return false; 
+      }
+      
+      const gameLocation = {
+        latitude: gameLat,
+        longitude: gameLng
+      };
+      
+    
+      const distanceInMeters = geolib.getDistance(
+        userLocation,
+        gameLocation,
+        1 
+      );
+      
+      
+      game.dataValues.distanceInMeters = distanceInMeters;
+      
+    
+      return distanceInMeters <= maxDistance;
+    });
+    
+  
+    nearbyGames.sort((a, b) => a.dataValues.distanceInMeters - b.dataValues.distanceInMeters);
+    
     if (nearbyGames.length === 0) {
-      return res.status(400).json({ message: "No nearby games found" });
+      return res.status(404).json({ message: "No nearby games found within the specified distance" });
     }
-    return res.status(200).json({ nearbyGames: nearbyGames });
-  }catch(error)
-  {
-    console.error('Error in fetching nearby games', error);
+    
+    return res.status(200).json({ 
+      nearbyGames: nearbyGames,
+      count: nearbyGames.length
+    });
+    
+  } catch (error) {
+    console.error('Error in fetching nearby games:', error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
-})
+});
 
 module.exports = router;
