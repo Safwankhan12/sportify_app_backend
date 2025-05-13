@@ -5,6 +5,7 @@ const { body, validationResult } = require("express-validator");
 const { Booking, User, Venue, Game, GameRequest, GameResult } = require("../models");
 const PrivateGameCode = require("../utils/PrivateCode");
 const nodemailer = require("nodemailer");
+const geolib = require('geolib')
 const checkAndAwardBadges = require('../utils/BadgeService')
 const PrivateCodeNotification = require('../NotificationService/PrivateCodeNotificationService')
 const GameCancellationNotification = require('../NotificationService/GameCancellationNotificationService')
@@ -799,6 +800,35 @@ router.get('/search/available',async(req,res)=>{
   }catch(error)
   {
     console.error('Error in fetching available games', error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+})
+
+
+router.get('/getnearbygames',async(req,res)=>{
+  try{
+    const {latitude, longitude, distance} = req.query
+    if (!latitude || !longitude || !distance) {
+      return res.status(400).json({ error: "Please provide latitude and longitude and distance" });
+    }
+    const userLocation = { latitude: parseFloat(latitude), longitude: parseFloat(longitude) };
+    const allgames = await Game.findAll();
+    if (!allgames) {
+      return res.status(400).json({ error: "No games found" });
+    }
+    const nearbyGames = allgames.filter(game => 
+      geolib.getDistance(userLocation , {
+        latitude : game.latitude,
+        longitude : game.longitude
+      }) <= distance
+    )
+    if (nearbyGames.length === 0) {
+      return res.status(400).json({ message: "No nearby games found" });
+    }
+    return res.status(200).json({ nearbyGames: nearbyGames });
+  }catch(error)
+  {
+    console.error('Error in fetching nearby games', error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 })
