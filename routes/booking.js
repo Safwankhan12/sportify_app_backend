@@ -219,7 +219,7 @@ router.put('/confirmbooking/:uuid', async(req, res) => {
       
       await Booking.update({ status: "Confirmed" }, { where: { uuid: bookingid } });
       await Venue.update({ status: "Booked" }, { where: { uuid: venue.uuid } });
-       sendBookingConfirmNotification(booking.userEmail, booking.bookingDate, booking.bookingTime, booking.venueName, venue.price, venueOwner.accountNo, venueOwner.phoneNo);
+       sendBookingConfirmNotification(booking.userEmail, booking.bookingDate, booking.bookingTime, booking.venueName, venue.price, venueOwner.accountNo, venueOwner.phoneNo, status);
       return res.status(200).json({ message: "Booking confirmed" });
     }
     
@@ -237,6 +237,8 @@ router.put('/confirmbooking/:uuid', async(req, res) => {
       if (!otherConfirmBookings) {
         await Venue.update({ status: "Available" }, { where: { uuid: venue.uuid } });
       }
+      sendBookingConfirmNotification(booking.userEmail, booking.bookingDate, booking.bookingTime, booking.venueName, venue.price, venueOwner.accountNo, venueOwner.phoneNo, status);
+      
       return res.status(200).json({ message: "Booking rejected" });
     }
   } catch (err) {
